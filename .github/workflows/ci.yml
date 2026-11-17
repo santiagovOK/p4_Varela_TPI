@@ -1,0 +1,255 @@
+name: Food Store TPI — CI
+
+'on':
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  backend-postgres:
+    name: Validar Backend & PostgreSQL (SQLModel)
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: foodstore_test
+          POSTGRES_USER: foodstore
+          POSTGRES_PASSWORD: foodstore_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U foodstore -d foodstore_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql+psycopg2://foodstore:foodstore_password@localhost:5432/foodstore_test
+      TEST_DATABASE_URL: postgresql+psycopg2://foodstore:foodstore_password@localhost:5432/foodstore_test
+      PYTHONPATH: .
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: foodstore-backend/requirements.txt
+
+      - name: Instalar dependencias de Backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r foodstore-backend/requirements.txt
+
+      - name: Validar Conectividad, Esquema SQLModel y Seed Idempotente
+        working-directory: foodstore-backend
+        run: |
+          python - << 'EOF'
+          import os
+          import sys
+          import pathlib
+          import inspect
+          import importlib
+          from sqlalchemy import create_engine, text, inspect as sa_inspect
+
+          db_url = os.environ.get("DATABASE_URL")
+          if not db_url:
+              print("ERROR: Variable DATABASE_URL no definida", file=sys.stderr)
+              sys.exit(1)
+
+          engine = create_engine(db_url)
+
+          # Fase A: Conectividad base y verificación de motor PostgreSQL
+          try:
+              with engine.connect() as conn:
+                  result = conn.execute(text("SELECT current_database(), version()")).fetchone()
+                  current_db, db_version = result[0], result[1]
+                  print(f"[OK] Conexión establecida a PostgreSQL: DB={current_db}")
+                  print(f"[INFO] Versión del servidor: {db_version}")
+                  if current_db != "foodstore_test":
+                      print(f"ERROR: Base de datos conectada ({current_db}) no es foodstore_test", file=sys.stderr)
+                      sys.exit(1)
+                  if engine.dialect.name != "postgresql":
+                      print(f"ERROR: Dialecto ({engine.dialect.name}) no es postgresql", file=sys.stderr)
+                      sys.exit(1)
+          except Exception as e:
+              print(f"ERROR al conectar a PostgreSQL con DATABASE_URL: {e}", file=sys.stderr)
+              sys.exit(1)
+
+          # Detectar archivos existentes y validar las etapas de infraestructura disponibles
+          app_dir = pathlib.Path("app")
+          has_app_code = app_dir.is_dir() and any(app_dir.rglob("*.py"))
+
+          if not has_app_code:
+              print("[OK] Conexión a PostgreSQL 16 verificada. Aún no hay código Python en app/.")
+              sys.exit(0)
+
+          # Si existen paquetes en app/, verificar importabilidad de los archivos detectados
+          expected_packages = [
+              "app",
+              "app.core",
+              "app.modules",
+              "app.modules.categorias",
+              "app.modules.productos",
+          ]
+          for pkg in expected_packages:
+              try:
+                  importlib.import_module(pkg)
+              except Exception as e:
+                  print(f"ERROR: No se pudo importar el paquete modular '{pkg}': {e}", file=sys.stderr)
+                  sys.exit(1)
+
+          db_file = pathlib.Path("app/core/database.py")
+          if not db_file.is_file():
+              print("[OK] Estructura modular detectada en app/. Aún no se encontraron database.py ni modelos SQLModel.")
+              sys.exit(0)
+
+          # Validación de app.core.database y SQLModel.metadata.create_all
+          try:
+              db_module = importlib.import_module("app.core.database")
+          except Exception as e:
+              print(f"ERROR: No se pudo importar app.core.database: {e}", file=sys.stderr)
+              sys.exit(1)
+
+          if not hasattr(db_module, "engine"):
+              print("ERROR: app.core.database no expone 'engine'", file=sys.stderr)
+              sys.exit(1)
+
+          app_engine = db_module.engine
+          if app_engine.url.get_backend_name() != "postgresql":
+              print(f"ERROR: engine en database.py configurado con '{app_engine.url.get_backend_name()}', se exige 'postgresql'", file=sys.stderr)
+              sys.exit(1)
+
+          has_session_dep = hasattr(db_module, "get_session") or hasattr(db_module, "SessionDep")
+          if not has_session_dep:
+              print("ERROR: app.core.database no expone 'get_session' ni 'SessionDep'", file=sys.stderr)
+              sys.exit(1)
+
+          model_files = list(app_dir.glob("modules/**/model.py")) + list(app_dir.glob("modules/**/models.py"))
+          if not model_files:
+              print("[OK] Motor PostgreSQL en app.core.database verificado. Aún no se encontraron modelos SQLModel.")
+              sys.exit(0)
+          from sqlmodel import SQLModel, Session
+
+          # Pre-importar dinámicamente todos los módulos de app para registrar tablas en metadata
+          for py_path in sorted(app_dir.rglob("*.py")):
+              if py_path.name == "__init__.py":
+                  continue
+              mod_name = ".".join(py_path.with_suffix("").parts)
+              try:
+                  importlib.import_module(mod_name)
+              except Exception as e:
+                  print(f"[WARN] No se pudo pre-importar {mod_name}: {e}")
+
+          # Generar tablas dinámicamente en PostgreSQL
+          print("[INFO] Ejecutando SQLModel.metadata.create_all(engine)...")
+          SQLModel.metadata.create_all(app_engine)
+
+          inspector = sa_inspect(app_engine)
+          tables = inspector.get_table_names()
+          print(f"[INFO] Tablas creadas en PostgreSQL: {tables}")
+
+          for t in tables:
+              pk_cols = inspector.get_pk_constraint(t).get("constrained_columns", [])
+              if not pk_cols:
+                  print(f"ERROR: Tabla '{t}' no posee clave primaria en PostgreSQL", file=sys.stderr)
+                  sys.exit(1)
+
+          print("[OK] Esquema SQLModel verificado en PostgreSQL")
+
+          # Fase D: Validación de Seed Idempotente TPI (si existe app/db/seed.py)
+          seed_path = pathlib.Path("app/db/seed.py")
+          if seed_path.is_file():
+              print("[INFO] app/db/seed.py detectado. Validando idempotencia del semillado TPI...")
+              try:
+                  seed_module = importlib.import_module("app.db.seed")
+              except Exception as e:
+                  print(f"ERROR: No se pudo importar app.db.seed: {e}", file=sys.stderr)
+                  sys.exit(1)
+
+              seed_fn = getattr(seed_module, "seed", None) or getattr(seed_module, "run_seed", None)
+              if not callable(seed_fn):
+                  print("ERROR: No se encontró función de semillado en app/db/seed.py", file=sys.stderr)
+                  sys.exit(1)
+
+              def call_seed(fn):
+                  sig = inspect.signature(fn)
+                  if len(sig.parameters) == 0:
+                      return fn()
+                  with Session(app_engine) as session:
+                      return fn(session)
+
+              print(f"[INFO] Ejecutando '{seed_fn.__name__}' pasada 1...")
+              call_seed(seed_fn)
+              print(f"[INFO] Ejecutando '{seed_fn.__name__}' pasada 2 (test de idempotencia)...")
+              call_seed(seed_fn)
+              print("[OK] Seed TPI ejecutado idempotemente.")
+          else:
+              print("[INFO] app/db/seed.py aún no implementado; se omite validación de seed TPI.")
+          EOF
+
+      - name: Ejecutar suite Pytest (Backend)
+        working-directory: foodstore-backend
+        run: |
+          TEST_COUNT=$(find . -maxdepth 3 -type f \( -name "test_*.py" -o -name "*_test.py" \) | wc -l)
+          if [ "$TEST_COUNT" -gt 0 ]; then
+            echo "[INFO] Detectados $TEST_COUNT archivos de prueba en foodstore-backend. Ejecutando pytest..."
+            pytest -v
+          else
+            echo "[INFO] Sin archivos test_*.py en foodstore-backend/. Se omite pytest por ahora."
+          fi
+
+  frontend-ci:
+    name: Validar Frontend (TypeScript & Vitest)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Instalar pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+          cache-dependency-path: foodstore-frontend/pnpm-lock.yaml
+
+      - name: Instalar dependencias
+        working-directory: foodstore-frontend
+        run: pnpm install --frozen-lockfile
+
+      - name: Verificación estricta de tipos TypeScript
+        working-directory: foodstore-frontend
+        run: pnpm exec tsc -b --pretty
+
+      - name: Verificación de build Vite (adaptativo)
+        working-directory: foodstore-frontend
+        run: |
+          if [ -f "index.html" ]; then
+            echo "[INFO] index.html detectado. Ejecutando pnpm run build..."
+            pnpm run build
+          else
+            echo "[INFO] index.html no detectado. Se omite el build Vite en esta base heredada."
+          fi
+
+      - name: Ejecución de pruebas Vitest (adaptativo)
+        working-directory: foodstore-frontend
+        run: |
+          TEST_FILES=$(find src -type f \( -name "*.test.ts" -o -name "*.test.tsx" -o -name "*.spec.ts" -o -name "*.spec.tsx" \) 2>/dev/null | wc -l)
+          if [ "$TEST_FILES" -gt 0 ]; then
+            echo "[INFO] Detectados $TEST_FILES archivos de prueba. Ejecutando pnpm run test..."
+            pnpm run test
+          else
+            echo "[INFO] Sin archivos de prueba *.test.{ts,tsx} en src/. Se omite Vitest por ahora."
+          fi

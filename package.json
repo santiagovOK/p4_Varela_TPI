@@ -1,0 +1,22 @@
+{
+  "name": "foodstore-tpi",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm run dev:all",
+    "dev:front": "pnpm --dir foodstore-frontend run dev",
+    "dev:back": "cd foodstore-backend && ../.venv/bin/fastapi dev app/main.py",
+    "dev:all": "concurrently -k -n \"front,back\" -c \"cyan,green\" \"pnpm run dev:front\" \"pnpm run dev:back\"",
+    "dev:stop": "kill-port 5173 8000",
+    "stop": "pnpm run dev:stop",
+    "build:front": "pnpm --dir foodstore-frontend run build",
+    "test:back": "cd foodstore-backend && ../.venv/bin/python -m pytest",
+    "test:front": "pnpm --dir foodstore-frontend run test",
+    "test": "pnpm run test:back && pnpm run test:front"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "kill-port": "^2.0.1"
+  }
+}
