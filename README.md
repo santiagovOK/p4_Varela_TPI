@@ -1,6 +1,8 @@
 # Trabajo Práctico Integrador — Food Store: Sistema de pedidos de comida
 
 **Materia:** Programación IV (TUPaD - UTN).
+**Estudiante:** Varela, Santiago Octavio
+**Email institucional:** santiago.varela@tupad.utn.edu.ar
 
 - Consigna normativa: [consignas_tpi.md](docs/consignas_tpi.md) ([PDF](docs/consignas_tpi.pdf)).
 - Modelo objetivo: [UML Food Store](docs/tpi_UML_Food_Store.svg).
