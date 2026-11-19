@@ -1,26 +1,33 @@
-"""Punto de entrada principal de la aplicación FastAPI Food Store."""
+"""Punto de entrada principal de la aplicación FastAPI Food Store.
+
+Consigna TPI (docs/consignas_tpi.md):
+- app/main.py: crea la aplicación FastAPI, registra CORSMiddleware con
+  allow_credentials=True y allow_origins=[settings.FRONTEND_ORIGIN] (nunca '*'),
+  ejecuta create_all_tables() en lifespan y expone /docs y /redoc.
+- API REST /api/v1: todos los routers del sistema se montan bajo API_V1_PREFIX.
+- Criterio 1: Backend: estructura y configuración.
+- CE-05: Arranque autónomo con uvicorn app.main:app sin depender de setup.sh.
+"""
 
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-import os
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.core.database import create_db_and_tables
+from app.core.config import settings
+from app.core.database import create_all_tables
 from app.modules.categorias.router import router as categorias_router
 from app.modules.productos.router import router as productos_router
 
-# Orígenes permitidos para el frontend (Vite dev server en localhost y 127.0.0.1)
-_env_frontend = os.getenv("FRONTEND_ORIGIN", "").strip()
-CORS_ORIGINS: list[str] = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-]
-if _env_frontend and _env_frontend not in CORS_ORIGINS:
-    CORS_ORIGINS.append(_env_frontend)
+API_V1_PREFIX = "/api/v1"
+CORS_ORIGINS: list[str] = [settings.FRONTEND_ORIGIN]
 
 OPENAPI_TAGS: list[dict[str, str]] = [
+    {
+        "name": "Health",
+        "description": "Estado de disponibilidad de la API Food Store.",
+    },
     {
         "name": "Categorías",
         "description": "Operaciones sobre categorías de productos del catálogo.",
@@ -33,9 +40,9 @@ OPENAPI_TAGS: list[dict[str, str]] = [
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    """Gestiona el ciclo de vida de la aplicación: crea tablas al iniciar."""
-    create_db_and_tables()
+async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
+    """Inicializa el esquema de base de datos al arrancar."""
+    create_all_tables()
     yield
 
 
@@ -58,8 +65,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(categorias_router)
-app.include_router(productos_router)
+
+@app.get(f"{API_V1_PREFIX}/health", tags=["Health"])
+def health_check() -> dict[str, str]:
+    """Verifica que la API está operativa."""
+    return {"status": "ok"}
 
 
-__all__ = ["CORS_ORIGINS", "OPENAPI_TAGS", "app", "lifespan"]
+app.include_router(categorias_router, prefix=API_V1_PREFIX)
+app.include_router(productos_router, prefix=API_V1_PREFIX)
+
+__all__ = ["API_V1_PREFIX", "CORS_ORIGINS", "OPENAPI_TAGS", "app", "health_check", "lifespan"]

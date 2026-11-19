@@ -1,37 +1,47 @@
-"""Configuración del motor PostgreSQL (con soporte de fallback SQLite) y dependencia de sesión SQLModel."""
+"""Configuración del motor de base de datos, fábrica de sesiones y creación de tablas.
 
-import os
+Consigna TPI (docs/consignas_tpi.md):
+- Componentes del núcleo (app/core/database.py): engine, create_all_tables y
+  session_factory consumiendo settings.DATABASE_URL desde app.core.config.
+- Stack del backend: SQLModel sobre PostgreSQL (psycopg2-binary) con soporte
+  de desarrollo/pruebas en SQLite.
+- Regla del Unit of Work: sesiones creadas con expire_on_commit=False.
+- Criterio 1: Backend: estructura y configuración.
+- CE-05: Arranque autónomo con uvicorn app.main:app inicializando esquema vía
+  create_all_tables() sin depender de setup.sh.
+"""
+
 from collections.abc import Generator
+from pathlib import Path
 from typing import Annotated, Any
 
-from dotenv import load_dotenv
 from fastapi import Depends
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
 from sqlalchemy.pool import StaticPool
 from sqlmodel import Session, SQLModel, create_engine
 
-load_dotenv()
+from app.core.config import settings
 
-DEFAULT_DATABASE_URL = (
-    "postgresql+psycopg2://postgres:postgres@localhost:5432/foodstore"
-)
+BACKEND_DIR = Path(__file__).resolve().parents[2]
 
 
-def _resolve_database_url() -> str:
-    """Obtiene y normaliza la cadena de conexión a la base de datos desde el entorno."""
-    raw_url = os.getenv("DATABASE_URL", DEFAULT_DATABASE_URL).strip()
-    if not raw_url:
-        return DEFAULT_DATABASE_URL
-    if raw_url.startswith("postgres://"):
-        return raw_url.replace("postgres://", "postgresql+psycopg2://", 1)
-    if raw_url.startswith("postgresql://"):
-        return raw_url.replace("postgresql://", "postgresql+psycopg2://", 1)
-    return raw_url
+def normalize_database_url(raw_url: str) -> str:
+    """Normaliza la URL de conexión para PostgreSQL (psycopg2) y SQLite relativa."""
+    url = raw_url.strip()
+    if url.startswith("postgres://"):
+        return url.replace("postgres://", "postgresql+psycopg2://", 1)
+    if url.startswith("postgresql://"):
+        return url.replace("postgresql://", "postgresql+psycopg2://", 1)
+    if url.startswith("sqlite:///./"):
+        relative_path = url.removeprefix("sqlite:///./")
+        resolved_path = (BACKEND_DIR / relative_path).resolve()
+        return f"sqlite:///{resolved_path}"
+    return url
 
 
 def _configurar_sqlite(dbapi_connection: Any, _connection_record: Any) -> None:
-    """Registra char_length y activa claves foráneas en conexiones SQLite de desarrollo/pruebas."""
+    """Registra char_length y activa PRAGMA foreign_keys=ON en conexiones SQLite."""
     if hasattr(dbapi_connection, "create_function"):
         dbapi_connection.create_function("char_length", 1, len)
     if hasattr(dbapi_connection, "cursor"):
@@ -44,7 +54,10 @@ def _build_engine(database_url: str) -> Engine:
     """Construye el motor SQLAlchemy/SQLModel para PostgreSQL o SQLite."""
     if database_url.startswith("sqlite"):
         connect_args = {"check_same_thread": False}
-        if ":memory:" in database_url:
+        is_in_memory = (
+            ":memory:" in database_url or database_url.rstrip("/") == "sqlite:"
+        )
+        if is_in_memory:
             eng = create_engine(
                 database_url,
                 echo=False,
@@ -68,28 +81,42 @@ def _build_engine(database_url: str) -> Engine:
     )
 
 
-DATABASE_URL: str = _resolve_database_url()
+DATABASE_URL: str = normalize_database_url(settings.DATABASE_URL)
 
 engine: Engine = _build_engine(DATABASE_URL)
 
 
-def create_db_and_tables() -> None:
+def session_factory() -> Session:
+    """Crea una nueva sesión SQLModel con expire_on_commit=False (regla Unit of Work)."""
+    return Session(engine, expire_on_commit=False)
+
+
+def create_all_tables(target_engine: Engine | None = None) -> None:
     """Crea todas las tablas registradas en los metadatos de SQLModel."""
-    SQLModel.metadata.create_all(engine)
+    SQLModel.metadata.create_all(target_engine or engine)
+
+
+def create_db_and_tables() -> None:
+    """Alias compatible de create_all_tables()."""
+    create_all_tables()
 
 
 def get_session() -> Generator[Session, None, None]:
-    """Provee una sesión transaccional de SQLModel por solicitud HTTP y garantiza su cierre."""
-    with Session(engine) as session:
+    """Provee una sesión SQLModel por solicitud HTTP y garantiza su cierre."""
+    with session_factory() as session:
         yield session
 
 
 SessionDep = Annotated[Session, Depends(get_session)]
 
 __all__ = [
+    "BACKEND_DIR",
     "DATABASE_URL",
     "SessionDep",
+    "create_all_tables",
     "create_db_and_tables",
     "engine",
     "get_session",
+    "normalize_database_url",
+    "session_factory",
 ]

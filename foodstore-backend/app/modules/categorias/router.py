@@ -1,9 +1,13 @@
-"""Router HTTP para el módulo de Categorías (base lista para migración TPI)."""
+"""Router HTTP para el módulo de Categorías.
+
+El prefijo global `/api/v1` se aplica al montar este router en `app/main.py`
+(docs/consignas_tpi.md: app/main.py y API REST — Convenciones).
+"""
 
 from fastapi import APIRouter
 
 router = APIRouter(
-    prefix="/api/v1/categorias",
+    prefix="/categorias",
     tags=["Categorías"],
 )
 
