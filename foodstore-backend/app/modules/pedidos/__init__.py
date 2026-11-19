@@ -1,6 +1,7 @@
 """Módulo de gestión de pedidos y detalles de pedido."""
 
 from app.modules.pedidos.models import DetallePedido, Pedido
+from app.modules.pedidos.repository import PedidoRepository
 from app.modules.pedidos.schemas import (
     CambioEstado,
     DetallePedidoRead,
@@ -12,6 +13,7 @@ from app.modules.pedidos.schemas import (
     PedidosPaginados,
     ResumenPedidos,
 )
+from app.modules.pedidos.unit_of_work import PedidoUnitOfWork
 
 __all__ = [
     "CambioEstado",
@@ -23,6 +25,8 @@ __all__ = [
     "Pedido",
     "PedidoCreate",
     "PedidoRead",
+    "PedidoRepository",
+    "PedidoUnitOfWork",
     "PedidosPaginados",
     "ResumenPedidos",
 ]
