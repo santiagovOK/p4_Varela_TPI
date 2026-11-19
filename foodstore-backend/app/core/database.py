@@ -93,6 +93,10 @@ def session_factory() -> Session:
 
 def create_all_tables(target_engine: Engine | None = None) -> None:
     """Crea todas las tablas registradas en los metadatos de SQLModel."""
+    # Registra los modelos de dominio antes de generar el esquema DDL.
+    from app.modules.categorias.models import Categoria  # noqa: F401
+    from app.modules.productos.models import Producto  # noqa: F401
+
     SQLModel.metadata.create_all(target_engine or engine)
 
 
