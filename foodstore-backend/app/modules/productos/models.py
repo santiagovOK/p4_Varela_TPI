@@ -4,7 +4,8 @@ Consigna TPI (docs/consignas_tpi.md):
 - Modelo de dominio Producto: tabla `productos` con `id`, `categoria_id` (FK a
   `categorias.id`), `nombre`, `descripcion`, `precio_base` (>= 0), `imagen_url`,
   `stock` (entero >= 0), `disponible` y `activo`.
-- Modelos y relaciones 1:N: relación `categoria` (`back_populates="productos"`).
+- Modelos y relaciones 1:N: relación `categoria` (`back_populates="productos"`) y
+  `detalles` (`back_populates="producto"`).
 - Criterio 2: Modelo de datos.
 """
 
@@ -14,6 +15,7 @@ from sqlmodel import Field, Relationship, SQLModel
 
 if TYPE_CHECKING:
     from app.modules.categorias.models import Categoria
+    from app.modules.pedidos.models import DetallePedido
 
 
 class Producto(SQLModel, table=True):
@@ -37,6 +39,8 @@ class Producto(SQLModel, table=True):
 
     # Relación N:1 con Categoria (docs/consignas_tpi.md: Modelos y relaciones 1:N).
     categoria: Optional["Categoria"] = Relationship(back_populates="productos")
+    # Relación 1:N con DetallePedido (docs/consignas_tpi.md: Producto.detalles).
+    detalles: list["DetallePedido"] = Relationship(back_populates="producto")
 
 
 __all__ = ["Producto"]
