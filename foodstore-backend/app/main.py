@@ -20,6 +20,7 @@ from app.core.database import create_all_tables
 from app.modules.auth.router import router as auth_router
 from app.modules.categorias.router import router as categorias_router
 from app.modules.productos.router import router as productos_router
+from app.modules.usuarios.router import router as usuarios_router
 
 API_V1_PREFIX = "/api/v1"
 CORS_ORIGINS: list[str] = [settings.FRONTEND_ORIGIN]
@@ -32,6 +33,10 @@ OPENAPI_TAGS: list[dict[str, str]] = [
     {
         "name": "Autenticación",
         "description": "Registro público, login con cookie HttpOnly, logout y perfil de sesión.",
+    },
+    {
+        "name": "Usuarios",
+        "description": "Gestión administrativa de usuarios (listado, activación y desactivación).",
     },
     {
         "name": "Categorías",
@@ -78,6 +83,7 @@ def health_check() -> dict[str, str]:
 
 
 app.include_router(auth_router, prefix=API_V1_PREFIX)
+app.include_router(usuarios_router, prefix=API_V1_PREFIX)
 app.include_router(categorias_router, prefix=API_V1_PREFIX)
 app.include_router(productos_router, prefix=API_V1_PREFIX)
 

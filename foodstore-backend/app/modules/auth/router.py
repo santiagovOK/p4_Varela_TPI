@@ -16,7 +16,8 @@ from sqlmodel import Session
 
 from app.core.config import Settings, get_settings
 from app.core.database import get_session
-from app.core.security import create_access_token, decode_access_token
+from app.core.deps import ACCESS_COOKIE_NAME, get_current_active_user
+from app.core.security import create_access_token
 from app.core.unit_of_work import UnitOfWork
 from app.modules.auth.schemas import LoginMessage, LogoutMessage, UserCreate, UserPublic
 from app.modules.auth.service import (
@@ -25,8 +26,8 @@ from app.modules.auth.service import (
     CuentaDesactivada,
     UsuarioDuplicado,
 )
+from app.modules.usuarios.models import Usuario
 
-ACCESS_COOKIE_NAME = "access_token"
 ACCESS_COOKIE = ACCESS_COOKIE_NAME
 
 router = APIRouter(prefix="/auth", tags=["Autenticación"])
@@ -41,75 +42,6 @@ def get_auth_service(session: Session = Depends(get_session)) -> AuthService:
 def _resolve_cookie_secure(current_settings: Settings) -> bool:
     """Resuelve el flag `secure` de la cookie desde Settings."""
     return current_settings.cookie_secure
-
-
-def _resolve_current_active_user_from_cookie(
-    request: Request,
-    service: Annotated[AuthService, Depends(get_auth_service)],
-) -> UserPublic:
-    """Extrae el JWT exclusivamente de la cookie `access_token` y consulta BD."""
-    token = request.cookies.get(ACCESS_COOKIE_NAME)
-    if not token:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="No autenticado",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    payload = decode_access_token(token)
-    if payload is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="No autenticado",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    username = payload.get("sub")
-    if not isinstance(username, str) or not username.strip():
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="No autenticado",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    try:
-        return service.get_active_user_by_username(username)
-    except CredencialesInvalidas as exc:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="No autenticado",
-            headers={"WWW-Authenticate": "Bearer"},
-        ) from exc
-    except CuentaDesactivada as exc:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Cuenta de usuario desactivada",
-        ) from exc
-
-
-try:
-    from app.core.deps import get_current_active_user as _core_get_current_active_user
-except ImportError:
-    _core_get_current_active_user = None
-
-
-def get_current_active_user_for_me(
-    request: Request,
-    service: Annotated[AuthService, Depends(get_auth_service)],
-) -> UserPublic:
-    """Dependencia para `/me`: delega a app.core.deps si existe (E4.3) o usa cookie local."""
-    if _core_get_current_active_user is not None:
-        session_gen = get_session()
-        session = next(session_gen)
-        try:
-            user = _core_get_current_active_user(request=request, session=session)
-            return UserPublic.model_validate(user)
-        finally:
-            try:
-                next(session_gen)
-            except StopIteration:
-                pass
-    return _resolve_current_active_user_from_cookie(request=request, service=service)
 
 
 @router.post(
@@ -206,7 +138,7 @@ def logout(response: Response) -> LogoutMessage:
     summary="Obtener perfil del usuario autenticado",
 )
 def read_users_me(
-    current_user: Annotated[UserPublic, Depends(get_current_active_user_for_me)],
+    current_user: Annotated[Usuario, Depends(get_current_active_user)],
 ) -> UserPublic:
     """Retorna el perfil del usuario autenticado validado contra la base de datos."""
     return UserPublic.model_validate(current_user)
