@@ -17,6 +17,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.core.database import create_all_tables
+from app.modules.auth.router import router as auth_router
 from app.modules.categorias.router import router as categorias_router
 from app.modules.productos.router import router as productos_router
 
@@ -27,6 +28,10 @@ OPENAPI_TAGS: list[dict[str, str]] = [
     {
         "name": "Health",
         "description": "Estado de disponibilidad de la API Food Store.",
+    },
+    {
+        "name": "Autenticación",
+        "description": "Registro público, login con cookie HttpOnly, logout y perfil de sesión.",
     },
     {
         "name": "Categorías",
@@ -72,6 +77,7 @@ def health_check() -> dict[str, str]:
     return {"status": "ok"}
 
 
+app.include_router(auth_router, prefix=API_V1_PREFIX)
 app.include_router(categorias_router, prefix=API_V1_PREFIX)
 app.include_router(productos_router, prefix=API_V1_PREFIX)
 

@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     ALGORITHM: str = Field(default="HS256", min_length=1)
     ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=30, gt=0)
     FRONTEND_ORIGIN: str = Field(default="http://localhost:5173", min_length=1)
+    COOKIE_SECURE: bool | None = Field(default=None)
 
     model_config = SettingsConfigDict(
         env_file=Path(__file__).resolve().parents[2] / ".env",
@@ -53,6 +54,16 @@ class Settings(BaseSettings):
         if value == "*":
             raise ValueError("FRONTEND_ORIGIN no puede ser '*'")
         return value
+
+    @property
+    def cookie_secure(self) -> bool:
+        """Determina el flag `secure` de la cookie HttpOnly:
+        usa COOKIE_SECURE si fue explícitamente definido; de lo contrario,
+        es True cuando FRONTEND_ORIGIN usa https:// y False en http:// local.
+        """
+        if self.COOKIE_SECURE is not None:
+            return self.COOKIE_SECURE
+        return self.FRONTEND_ORIGIN.lower().startswith("https://")
 
 
 @lru_cache
