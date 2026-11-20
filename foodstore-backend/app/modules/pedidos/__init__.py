@@ -19,16 +19,21 @@ from app.modules.pedidos.schemas import (
     ResumenPedidos,
 )
 from app.modules.pedidos.service import (
+    TRANSICIONES_VALIDAS,
     DatosPedidoInvalidos,
+    PedidoAjeno,
+    PedidoNoEncontrado,
     PedidoService,
     ProductoNoDisponible,
     ProductoNoEncontrado,
     ProductoRepetido,
     StockInsuficiente,
+    TransicionInvalida,
 )
 from app.modules.pedidos.unit_of_work import PedidoUnitOfWork
 
 __all__ = [
+    "TRANSICIONES_VALIDAS",
     "CambioEstado",
     "DatosPedidoInvalidos",
     "DetallePedido",
@@ -37,7 +42,9 @@ __all__ = [
     "FormaPago",
     "ItemPedidoCreate",
     "Pedido",
+    "PedidoAjeno",
     "PedidoCreate",
+    "PedidoNoEncontrado",
     "PedidoRead",
     "PedidoRepository",
     "PedidoService",
@@ -48,6 +55,7 @@ __all__ = [
     "ProductoRepetido",
     "ResumenPedidos",
     "StockInsuficiente",
+    "TransicionInvalida",
     "get_pedido_service",
     "get_pedidos_service",
     "router",
