@@ -19,6 +19,7 @@ from app.core.config import settings
 from app.core.database import create_all_tables
 from app.modules.auth.router import router as auth_router
 from app.modules.categorias.router import router as categorias_router
+from app.modules.pedidos.router import router as pedidos_router
 from app.modules.productos.router import router as productos_router
 from app.modules.usuarios.router import router as usuarios_router
 
@@ -45,6 +46,10 @@ OPENAPI_TAGS: list[dict[str, str]] = [
     {
         "name": "Productos",
         "description": "Operaciones sobre productos, precios y stock del catálogo.",
+    },
+    {
+        "name": "Pedidos",
+        "description": "Creación transaccional y gestión de pedidos.",
     },
 ]
 
@@ -86,5 +91,6 @@ app.include_router(auth_router, prefix=API_V1_PREFIX)
 app.include_router(usuarios_router, prefix=API_V1_PREFIX)
 app.include_router(categorias_router, prefix=API_V1_PREFIX)
 app.include_router(productos_router, prefix=API_V1_PREFIX)
+app.include_router(pedidos_router, prefix=API_V1_PREFIX)
 
 __all__ = ["API_V1_PREFIX", "CORS_ORIGINS", "OPENAPI_TAGS", "app", "health_check", "lifespan"]
