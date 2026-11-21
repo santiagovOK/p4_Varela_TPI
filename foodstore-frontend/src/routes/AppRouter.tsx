@@ -7,6 +7,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 
 import { LoginPage, RegisterPage, UnauthorizedPage } from '@/features/auth'
+import { CatalogoPage } from '@/features/productos'
 import { ProtectedRoute } from '@/shared/components/ProtectedRoute'
 import { MainLayout } from '@/shared/layout'
 
@@ -32,15 +33,7 @@ export function AppRoutes() {
     <Routes>
       <Route element={<MainLayout />}>
         {/* Rutas públicas */}
-        <Route
-          path="/"
-          element={
-            <RoutePlaceholder
-              title="Food Store"
-              description="Catálogo público pendiente de integración en E8.2."
-            />
-          }
-        />
+        <Route path="/" element={<CatalogoPage />} />
         <Route
           path="/carrito"
           element={

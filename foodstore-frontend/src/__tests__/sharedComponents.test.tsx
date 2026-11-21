@@ -1,3 +1,4 @@
+import { QueryClientProvider } from '@tanstack/react-query'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { AxiosAdapter, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
@@ -301,9 +302,11 @@ describe('Layout Navbar y MainLayout integrados en AppRoutes', () => {
     })
 
     render(
-      <MemoryRouter initialEntries={['/']}>
-        <AppRoutes />
-      </MemoryRouter>,
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={['/']}>
+          <AppRoutes />
+        </MemoryRouter>
+      </QueryClientProvider>,
     )
 
     expect(screen.getByRole('link', { name: 'Food Store' })).toBeInTheDocument()
@@ -320,9 +323,11 @@ describe('Layout Navbar y MainLayout integrados en AppRoutes', () => {
     useAuthStore.setState({ usuario: USER_CLIENTE, cargando: false, error: null })
 
     const { rerender } = render(
-      <MemoryRouter initialEntries={['/']}>
-        <AppRoutes />
-      </MemoryRouter>,
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={['/']}>
+          <AppRoutes />
+        </MemoryRouter>
+      </QueryClientProvider>,
     )
 
     expect(screen.getByText('Cliente Uno')).toBeInTheDocument()
@@ -333,9 +338,11 @@ describe('Layout Navbar y MainLayout integrados en AppRoutes', () => {
 
     useAuthStore.setState({ usuario: USER_ADMIN, cargando: false, error: null })
     rerender(
-      <MemoryRouter initialEntries={['/']}>
-        <AppRoutes />
-      </MemoryRouter>,
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={['/']}>
+          <AppRoutes />
+        </MemoryRouter>
+      </QueryClientProvider>,
     )
 
     expect(screen.getByText('Admin FoodStore')).toBeInTheDocument()
@@ -364,6 +371,12 @@ describe('Layout Navbar y MainLayout integrados en AppRoutes', () => {
         logoutCalls += 1
         return createAxiosResponse(config, 200, { message: 'Logout exitoso' })
       }
+      if (config.url === '/categorias') {
+        return createAxiosResponse(config, 200, [])
+      }
+      if (config.url === '/productos') {
+        return createAxiosResponse(config, 200, { total: 0, items: [] })
+      }
       throw new Error(`Unexpected URL: ${config.url}`)
     }
     axiosInstance.defaults.adapter = mockAdapter
@@ -371,9 +384,11 @@ describe('Layout Navbar y MainLayout integrados en AppRoutes', () => {
     useAuthStore.setState({ usuario: USER_CLIENTE, cargando: false, error: null })
 
     render(
-      <MemoryRouter initialEntries={['/']}>
-        <AppRoutes />
-      </MemoryRouter>,
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={['/']}>
+          <AppRoutes />
+        </MemoryRouter>
+      </QueryClientProvider>,
     )
 
     await user.click(screen.getByRole('button', { name: 'Cerrar sesión' }))

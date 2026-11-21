@@ -63,6 +63,12 @@ def test_seed_inicializa_bd_limpia_y_cumple_contrato_ce04() -> None:
             )
             assert len(productos) >= 8
             assert all(p.categoria_id is not None for p in productos)
+            assert all(
+                p.imagen_url is not None
+                and p.imagen_url.startswith("/img/")
+                and p.imagen_url.endswith(".jpg")
+                for p in productos
+            )
     finally:
         test_engine.dispose()
 
@@ -134,3 +140,31 @@ def test_seed_cli_python_m_app_db_seed_idempotente(tmp_path: Path) -> None:
             assert all(p.stock > 0 and p.disponible and p.activo for p in productos)
     finally:
         verify_engine.dispose()
+
+
+def test_seed_migra_idempotentemente_urls_cdn_legacy() -> None:
+    """Si existen productos con el placeholder CDN legacy, seed() los migra a /img/ sin duplicar."""
+    test_engine = _build_engine("sqlite:///:memory:")
+    try:
+        primero = seed(test_engine)
+        with Session(test_engine) as session:
+            clasica = session.exec(
+                select(Producto).where(Producto.nombre == "Hamburguesa Clásica")
+            ).first()
+            assert clasica is not None
+            clasica.imagen_url = "https://cdn.foodstore.local/img/hamburguesa-clasica.jpg"
+            session.commit()
+
+        segundo = seed(test_engine)
+        assert segundo == {"usuarios": 0, "categorias": 0, "productos": 0}
+
+        with Session(test_engine) as session:
+            productos = list(session.exec(select(Producto)).all())
+            assert len(productos) == primero["productos"]
+            clasica_actualizada = session.exec(
+                select(Producto).where(Producto.nombre == "Hamburguesa Clásica")
+            ).first()
+            assert clasica_actualizada is not None
+            assert clasica_actualizada.imagen_url == "/img/hamburguesa-clasica.jpg"
+    finally:
+        test_engine.dispose()

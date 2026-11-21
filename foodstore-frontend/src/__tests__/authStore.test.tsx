@@ -1,3 +1,4 @@
+import { QueryClientProvider } from '@tanstack/react-query'
 import { render, screen, waitFor } from '@testing-library/react'
 import {
   AxiosError,
@@ -366,11 +367,21 @@ describe('authStore, AuthProvider, ProtectedRoute y AppRouter', () => {
         meCalls += 1
         return createAxiosResponse(config, 200, USER_CLIENTE)
       }
+      if (config.url === '/categorias') {
+        return createAxiosResponse(config, 200, [])
+      }
+      if (config.url === '/productos') {
+        return createAxiosResponse(config, 200, { total: 0, items: [] })
+      }
       throw new Error(`Unexpected URL: ${config.url}`)
     }
 
     window.history.pushState({}, '', '/')
-    render(<App />)
+    render(
+      <QueryClientProvider client={queryClient}>
+        <App />
+      </QueryClientProvider>,
+    )
 
     await waitFor(() => {
       expect(meCalls).toBe(1)

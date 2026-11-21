@@ -43,16 +43,13 @@ SEED_CATEGORIAS: tuple[dict[str, str], ...] = (
     },
 )
 
-# Nota (E1.3 -> E8.2): Las URLs `https://cdn.foodstore.local/img/<slug>.jpg`
-# actúan como placeholders temporales hasta integrar el catálogo frontend (E8.2),
-# etapa en la que se incorporan los activos estáticos en
-# `foodstore-frontend/public/img/` y se sincronizan aquí como `/img/<slug>.jpg`.
+# Activos estáticos servidos desde `foodstore-frontend/public/img/<slug>.jpg` (E8.2).
 SEED_PRODUCTOS: tuple[dict[str, object], ...] = (
     {
         "nombre": "Hamburguesa Clásica",
         "descripcion": "Medallón vacuno, queso cheddar, lechuga, tomate y salsa especial.",
         "precio_base": 8500.0,
-        "imagen_url": "https://cdn.foodstore.local/img/hamburguesa-clasica.jpg",
+        "imagen_url": "/img/hamburguesa-clasica.jpg",
         "stock": 25,
         "categoria": "Hamburguesas",
     },
@@ -60,7 +57,7 @@ SEED_PRODUCTOS: tuple[dict[str, object], ...] = (
         "nombre": "Hamburguesa Doble Bacon",
         "descripcion": "Doble medallón, doble cheddar, panceta crocante y cebolla caramelizada.",
         "precio_base": 10900.0,
-        "imagen_url": "https://cdn.foodstore.local/img/hamburguesa-doble-bacon.jpg",
+        "imagen_url": "/img/hamburguesa-doble-bacon.jpg",
         "stock": 20,
         "categoria": "Hamburguesas",
     },
@@ -68,7 +65,7 @@ SEED_PRODUCTOS: tuple[dict[str, object], ...] = (
         "nombre": "Pizza Muzzarella",
         "descripcion": "Salsa de tomate casera, abundante muzzarella y aceitunas verdes.",
         "precio_base": 9200.0,
-        "imagen_url": "https://cdn.foodstore.local/img/pizza-muzzarella.jpg",
+        "imagen_url": "/img/pizza-muzzarella.jpg",
         "stock": 18,
         "categoria": "Pizzas",
     },
@@ -76,7 +73,7 @@ SEED_PRODUCTOS: tuple[dict[str, object], ...] = (
         "nombre": "Pizza Napolitana",
         "descripcion": "Muzzarella, rodajas de tomate fresco, ajo y albahaca.",
         "precio_base": 10200.0,
-        "imagen_url": "https://cdn.foodstore.local/img/pizza-napolitana.jpg",
+        "imagen_url": "/img/pizza-napolitana.jpg",
         "stock": 15,
         "categoria": "Pizzas",
     },
@@ -84,7 +81,7 @@ SEED_PRODUCTOS: tuple[dict[str, object], ...] = (
         "nombre": "Empanada de Carne Cortada a Cuchillo",
         "descripcion": "Relleno tradicional de carne vacuna, cebolla, morrón y huevo.",
         "precio_base": 1600.0,
-        "imagen_url": "https://cdn.foodstore.local/img/empanada-carne.jpg",
+        "imagen_url": "/img/empanada-carne.jpg",
         "stock": 45,
         "categoria": "Empanadas",
     },
@@ -92,7 +89,7 @@ SEED_PRODUCTOS: tuple[dict[str, object], ...] = (
         "nombre": "Empanada de Jamón y Queso",
         "descripcion": "Jamón cocido seleccionado y queso muzzarella fundido al horno.",
         "precio_base": 1500.0,
-        "imagen_url": "https://cdn.foodstore.local/img/empanada-jamon-queso.jpg",
+        "imagen_url": "/img/empanada-jamon-queso.jpg",
         "stock": 40,
         "categoria": "Empanadas",
     },
@@ -100,7 +97,7 @@ SEED_PRODUCTOS: tuple[dict[str, object], ...] = (
         "nombre": "Gaseosa Cola 500ml",
         "descripcion": "Botella individual de gaseosa Cola 500ml.",
         "precio_base": 2400.0,
-        "imagen_url": "https://cdn.foodstore.local/img/gaseosa-cola-500.jpg",
+        "imagen_url": "/img/gaseosa-cola-500.jpg",
         "stock": 50,
         "categoria": "Bebidas",
     },
@@ -108,7 +105,7 @@ SEED_PRODUCTOS: tuple[dict[str, object], ...] = (
         "nombre": "Agua Mineral sin Gas 500ml",
         "descripcion": "Agua mineral natural sin gas en botella de 500 ml.",
         "precio_base": 1800.0,
-        "imagen_url": "https://cdn.foodstore.local/img/agua-mineral-500.jpg",
+        "imagen_url": "/img/agua-mineral-500.jpg",
         "stock": 50,
         "categoria": "Bebidas",
     },
@@ -190,6 +187,10 @@ def _seed_in_session(session: Session) -> dict[str, int]:
                 producto.disponible = True
             if not producto.activo:
                 producto.activo = True
+            if not producto.imagen_url or producto.imagen_url.startswith(
+                "https://cdn.foodstore.local/img/"
+            ):
+                producto.imagen_url = str(item["imagen_url"])
 
     session.commit()
     return creados
