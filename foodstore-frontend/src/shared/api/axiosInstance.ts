@@ -1,3 +1,10 @@
+/**
+ * Instancia HTTP única de Axios con credenciales en cookie HttpOnly e interceptores de sesión.
+ * Trazabilidad (`docs/consignas_tpi.md`):
+ * - Sección "Autenticación y autorización" (paso 2, `withCredentials: true`, pág. 10).
+ * - Sección "Estado, datos y sesión — Cliente HTTP Axios" (`baseURL = VITE_API_URL`, interceptor
+ *   de `401` fuera de `/auth/token` y `/auth/me`, y `400` "Cuenta de usuario desactivada", págs. 18 y 20).
+ */
 import axios, { type InternalAxiosRequestConfig } from 'axios'
 
 import { handleApiError, isDisabledAccountError } from './handleApiError'

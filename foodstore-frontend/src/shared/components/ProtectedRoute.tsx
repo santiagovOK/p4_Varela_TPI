@@ -1,3 +1,9 @@
+/**
+ * Guardia de rutas autenticadas y restringidas por rol.
+ * Trazabilidad (`docs/consignas_tpi.md`):
+ * - Sección "Estado, datos y sesión — Rutas protegidas" (págs. 19–20): aguarda `checkSession`,
+ *   redirige a `/login` sin sesión y a `/unauthorized` cuando el rol no está autorizado.
+ */
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 
 import type { UserRole } from '@/features/auth'

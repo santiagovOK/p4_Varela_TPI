@@ -1,3 +1,8 @@
+/**
+ * Contratos de tipos para productos alineados con los schemas del backend (`productos`).
+ * Trazabilidad (`docs/consignas_tpi.md`):
+ * - Sección "Arquitectura por features — Tipos" (pág. 17) y tabla "Schemas" (pág. 14).
+ */
 import type { CategoriaRead } from '@/features/categorias'
 
 /** DTO de salida pública para un producto con su categoría asociada. */

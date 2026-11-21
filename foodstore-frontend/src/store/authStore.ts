@@ -1,3 +1,9 @@
+/**
+ * Store global de sesión del usuario autenticado (Zustand + `persist` con `partialize`).
+ * Trazabilidad (`docs/consignas_tpi.md`):
+ * - Sección "Estado, datos y sesión — authStore y Logout" (págs. 18 y 20): persiste
+ *   exclusivamente `usuario` (nunca el JWT) y coordina `login`, `logout` y `checkSession` (`/auth/me`).
+ */
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { useShallow } from 'zustand/react/shallow'

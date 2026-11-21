@@ -1,3 +1,8 @@
+/**
+ * Contratos de tipos para usuarios alineados con los schemas del backend (`usuarios`).
+ * Trazabilidad (`docs/consignas_tpi.md`):
+ * - Sección "Arquitectura por features — Tipos" (pág. 17) y tabla "Schemas" (pág. 14).
+ */
 /** Roles de usuario válidos en la aplicación. */
 export type UserRole = 'user' | 'admin'
 
