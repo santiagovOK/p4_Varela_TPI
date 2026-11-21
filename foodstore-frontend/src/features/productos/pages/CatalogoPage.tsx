@@ -3,11 +3,12 @@
  * Trazabilidad (`docs/consignas_tpi.md`):
  * - HU-TPI-02 (págs. 12–14, 18–20): ruta `/`, búsqueda, filtro por categoría y paginación.
  */
-import { useState, type ChangeEvent } from 'react'
+import { useRef, useState, type ChangeEvent } from 'react'
 
 import { useCategorias, type CategoriaRead } from '@/features/categorias'
 import { EstadoError, EstadoVacio, Paginacion, Skeleton } from '@/shared/components'
 import { Button, Input } from '@/shared/ui'
+import { useAuthSession } from '@/store/authStore'
 
 import { ProductoCard } from '../components/ProductoCard'
 import { CATALOGO_DEFAULT_LIMIT, useProductos } from '../hooks/useProductos'
@@ -17,10 +18,11 @@ const EMPTY_CATEGORIAS: readonly CategoriaRead[] = []
 
 /** Vista pública de catálogo montada en `/` con control de carga, vacío y error de refetch. */
 export function CatalogoPage() {
+  useAuthSession()
   const [searchInput, setSearchInput] = useState('')
   const [categoriaId, setCategoriaId] = useState<number | undefined>(undefined)
   const [skip, setSkip] = useState(0)
-  const [confirmedData, setConfirmedData] = useState<ProductosPaginados | undefined>(undefined)
+  const confirmedDataRef = useRef<ProductosPaginados | undefined>(undefined)
   const limit = CATALOGO_DEFAULT_LIMIT
 
   const normalizedSearch = searchInput.trim()
@@ -38,11 +40,11 @@ export function CatalogoPage() {
       disponible: true,
     })
 
-  if (data && !isPlaceholderData && data !== confirmedData) {
-    setConfirmedData(data)
+  if (data && !isPlaceholderData) {
+    confirmedDataRef.current = data
   }
 
-  const activeData = data ?? confirmedData
+  const activeData = data ?? confirmedDataRef.current
 
   function handleSearchChange(event: ChangeEvent<HTMLInputElement>) {
     const nextValue = event.target.value

@@ -4,6 +4,7 @@
  */
 export { getProductos } from './api/productosApi'
 export {
+  ADD_TO_CART_FEEDBACK_MS,
   ProductoCard,
   formatPrecio,
   isValidImageUrl,

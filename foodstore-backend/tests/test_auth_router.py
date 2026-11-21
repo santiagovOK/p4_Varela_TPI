@@ -347,3 +347,47 @@ def test_logout_elimina_cookie_e_invalida_sesion(
     assert "samesite=lax" in set_cookie.lower()
 
     assert client.get("/api/v1/auth/me").status_code == 401
+
+
+def test_login_y_me_con_usuario_seed_admin_email_local(
+    auth_client: tuple[TestClient, object],
+) -> None:
+    """Valida login y /me del admin del seed con email .local y confirma que UserCreate mantiene EmailStr."""
+    client, test_engine = auth_client
+    from app.db.seed import ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_USERNAME, seed
+
+    # 1) Ejecutar seed sobre el motor de pruebas
+    seed(test_engine)
+
+    # 2) Autenticar admin
+    login_resp = client.post(
+        "/api/v1/auth/token",
+        data={"username": ADMIN_USERNAME, "password": ADMIN_PASSWORD},
+    )
+    assert login_resp.status_code == 200
+    assert login_resp.json() == {"message": "Login exitoso"}
+    cookie_hdr = login_resp.headers.get("set-cookie", "")
+    assert f"{ACCESS_COOKIE_NAME}=" in cookie_hdr
+    assert "HttpOnly" in cookie_hdr
+
+    # 3) Consultar /me autenticado como admin
+    me_resp = client.get("/api/v1/auth/me")
+    assert me_resp.status_code == 200
+    me_data = me_resp.json()
+    assert me_data["username"] == ADMIN_USERNAME
+    assert me_data["email"] == ADMIN_EMAIL == "admin@foodstore.local"
+    assert me_data["role"] == "admin"
+    assert me_data["disabled"] is False
+    assert "hashed_password" not in me_data
+
+    # 4) Confirmar que UserCreate en /register sigue exigiendo formato RFC y rechaza .local
+    reg_invalid = client.post(
+        "/api/v1/auth/register",
+        json={
+            "username": "usuario_local",
+            "full_name": "Usuario Local",
+            "email": "invalido@foodstore.local",
+            "password": "Password123!",
+        },
+    )
+    assert reg_invalid.status_code == 422

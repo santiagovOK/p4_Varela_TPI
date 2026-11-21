@@ -8,6 +8,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 
 import { LoginPage, RegisterPage, UnauthorizedPage } from '@/features/auth'
 import {
+  AdminResumenPage,
   CarritoPage,
   CheckoutPage,
   MisPedidosPage,
@@ -54,15 +55,7 @@ export function AppRoutes() {
 
         {/* Rutas protegidas para administradores */}
         <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
-          <Route
-            path="/admin/resumen"
-            element={
-              <RoutePlaceholder
-                title="Resumen administrativo"
-                description="Panel de resumen pendiente de integración en E9.1."
-              />
-            }
-          />
+          <Route path="/admin/resumen" element={<AdminResumenPage />} />
           <Route
             path="/admin/categorias"
             element={

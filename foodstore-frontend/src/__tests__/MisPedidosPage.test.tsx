@@ -43,6 +43,16 @@ const USER_CLIENTE: UserPublic = {
   created_at: '2026-11-20T12:00:00Z',
 }
 
+const USER_ADMIN: UserPublic = {
+  id: 1,
+  username: 'admin',
+  full_name: 'Administrador',
+  email: 'admin@example.com',
+  role: 'admin',
+  disabled: false,
+  created_at: '2026-11-20T12:00:00Z',
+}
+
 function makePedido(overrides: Partial<PedidoRead> = {}): PedidoRead {
   return {
     id: 10,
@@ -410,5 +420,116 @@ describe('MisPedidosPage y PedidoDetallePage (E8.4)', () => {
 
     expect(await screen.findByText('Cancelado')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Cancelar pedido' })).not.toBeInTheDocument()
+  })
+
+  it('un usuario con rol admin en /mis-pedidos solo ve sus pedidos propios aunque el endpoint devuelva pedidos de otros usuarios', async () => {
+    useAuthStore.setState({ usuario: USER_ADMIN, cargando: false, error: null })
+
+    const pedidoPropioAdmin = makePedido({
+      id: 50,
+      usuario_id: USER_ADMIN.id,
+      estado: 'PENDIENTE',
+      direccion_entrega: 'Av. Admin 100',
+    })
+    const pedidoAjeno = makePedido({
+      id: 51,
+      usuario_id: USER_CLIENTE.id,
+      estado: 'PENDIENTE',
+      direccion_entrega: 'Calle Cliente 200',
+    })
+
+    const adapter: AxiosAdapter = vi.fn(async (config) => {
+      if (config.url === '/pedidos') {
+        return createAxiosResponse(config, 200, {
+          total: 2,
+          items: [pedidoPropioAdmin, pedidoAjeno],
+        } satisfies PedidosPaginados)
+      }
+      return createAxiosResponse(config, 404, { detail: 'No encontrado' })
+    })
+
+    axiosInstance.defaults.adapter = adapter
+    renderWithProviders(<MisPedidosPage />)
+
+    expect(await screen.findByText('Pedido #50')).toBeInTheDocument()
+    expect(screen.queryByText('Pedido #51')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Cancelar pedido #50' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Cancelar pedido #51' })).not.toBeInTheDocument()
+  })
+
+  it('si el admin no tiene pedidos propios en /mis-pedidos, ve EstadoVacio aunque existan pedidos de otros usuarios', async () => {
+    useAuthStore.setState({ usuario: USER_ADMIN, cargando: false, error: null })
+
+    const pedidoAjeno = makePedido({
+      id: 60,
+      usuario_id: USER_CLIENTE.id,
+      estado: 'PENDIENTE',
+    })
+
+    const adapter: AxiosAdapter = vi.fn(async (config) => {
+      if (config.url === '/pedidos') {
+        return createAxiosResponse(config, 200, {
+          total: 1,
+          items: [pedidoAjeno],
+        } satisfies PedidosPaginados)
+      }
+      return createAxiosResponse(config, 404, { detail: 'No encontrado' })
+    })
+
+    axiosInstance.defaults.adapter = adapter
+    renderWithProviders(<MisPedidosPage />)
+
+    expect(await screen.findByText('Todavía no realizaste pedidos')).toBeInTheDocument()
+    expect(screen.queryByText('Pedido #60')).not.toBeInTheDocument()
+  })
+
+  it('si un admin accede a /mis-pedidos/:id de un pedido ajeno, ve EstadoVacio en lugar del detalle ajeno', async () => {
+    const user = userEvent.setup()
+    useAuthStore.setState({ usuario: USER_ADMIN, cargando: false, error: null })
+
+    const pedidoAjeno = makePedido({
+      id: 77,
+      usuario_id: USER_CLIENTE.id,
+      estado: 'PENDIENTE',
+      direccion_entrega: 'Dirección privada del cliente',
+    })
+
+    const adapter: AxiosAdapter = vi.fn(async (config) => {
+      if (config.url === '/pedidos/77' && config.method === 'get') {
+        return createAxiosResponse(config, 200, pedidoAjeno)
+      }
+      if (config.url === '/pedidos' && config.method === 'get') {
+        return createAxiosResponse(config, 200, {
+          total: 0,
+          items: [],
+        } satisfies PedidosPaginados)
+      }
+      return createAxiosResponse(config, 404, { detail: 'No encontrado' })
+    })
+
+    axiosInstance.defaults.adapter = adapter
+
+    renderWithProviders(
+      <>
+        <Routes>
+          <Route path="/mis-pedidos" element={<MisPedidosPage />} />
+          <Route path="/mis-pedidos/:id" element={<PedidoDetallePage />} />
+        </Routes>
+        <LocationProbe />
+      </>,
+      ['/mis-pedidos/77'],
+    )
+
+    expect(await screen.findByText('Pedido no encontrado')).toBeInTheDocument()
+    expect(
+      screen.getByText('No tenés permisos para consultar este pedido o el pedido no existe.'),
+    ).toBeInTheDocument()
+    expect(screen.queryByText('Dirección privada del cliente')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Cancelar pedido' })).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Volver a mis pedidos' }))
+    await waitFor(() => {
+      expect(screen.getByTestId('current-path')).toHaveTextContent('/mis-pedidos')
+    })
   })
 })

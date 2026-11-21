@@ -9,6 +9,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { formatPrecio } from '@/features/productos'
 import { EstadoError, EstadoVacio, Skeleton } from '@/shared/components'
 import { BadgeEstado, Button, Card, Modal } from '@/shared/ui'
+import { useAuthSession } from '@/store/authStore'
 
 import { useCancelarPedido } from '../hooks/useCancelarPedido'
 import { usePedidoDetalle } from '../hooks/usePedidoDetalle'
@@ -34,6 +35,7 @@ function formatFecha(isoDate: string): string {
 export function PedidoDetallePage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const { usuario } = useAuthSession()
   const pedidoId = Number(id)
   const isValidId = Boolean(id) && Number.isInteger(pedidoId) && pedidoId > 0
 
@@ -120,6 +122,13 @@ export function PedidoDetallePage() {
         <EstadoVacio
           title="Pedido no encontrado"
           description="No encontramos el pedido solicitado."
+          actionLabel="Volver a mis pedidos"
+          onAction={() => navigate('/mis-pedidos')}
+        />
+      ) : activePedido.usuario_id !== usuario?.id ? (
+        <EstadoVacio
+          title="Pedido no encontrado"
+          description="No tenés permisos para consultar este pedido o el pedido no existe."
           actionLabel="Volver a mis pedidos"
           onAction={() => navigate('/mis-pedidos')}
         />

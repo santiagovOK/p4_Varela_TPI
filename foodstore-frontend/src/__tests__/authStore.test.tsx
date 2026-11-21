@@ -238,6 +238,62 @@ describe('authStore, AuthProvider, ProtectedRoute y AppRouter', () => {
     expect(useAuthStore.getState().usuario).toBeNull()
     expect(useAuthStore.getState().cargando).toBe(false)
     expect(queryClient.getQueryData(['pedidos'])).toBeUndefined()
+
+    useAuthStore.setState({ usuario: USER_CLIENTE, cargando: true, error: null })
+    queryClient.setQueryData(['pedidos'], [{ id: 101 }])
+    axiosInstance.defaults.adapter = async (config) => {
+      throw createAxiosHttpError(config, 401, { detail: 'No autenticado' })
+    }
+
+    await useAuthStore.getState().checkSession()
+
+    expect(useAuthStore.getState().usuario).toBeNull()
+    expect(useAuthStore.getState().cargando).toBe(false)
+    expect(queryClient.getQueryData(['pedidos'])).toBeUndefined()
+  })
+
+  it('no ejecuta queryClient.clear() ni borra queries públicas cuando checkSession recibe 401 con usuario null', async () => {
+    useAuthStore.setState({ usuario: null, cargando: true, error: null })
+    queryClient.setQueryData(['categorias'], [{ id: 1, nombre: 'Hamburguesas' }])
+
+    let resolveProductos!: (res: AxiosResponse) => void
+    const productosPending = new Promise<AxiosResponse>((resolve) => {
+      resolveProductos = resolve
+    })
+
+    axiosInstance.defaults.adapter = async (config) => {
+      if (config.url === '/auth/me') {
+        throw createAxiosHttpError(config, 401, { detail: 'No autenticado' })
+      }
+      if (config.url === '/productos') {
+        return productosPending.then((res) => ({ ...res, config }))
+      }
+      throw new Error(`Unexpected URL: ${config.url}`)
+    }
+
+    const clearSpy = vi.spyOn(queryClient, 'clear')
+    const productosKey = ['productos', { search: '', skip: 0, limit: 8, disponible: true }] as const
+    const productosPayload = { total: 1, items: [{ id: 10, nombre: 'Hamburguesa Clásica' }] }
+
+    const inFlightProductos = queryClient.fetchQuery({
+      queryKey: productosKey,
+      queryFn: async () => (await axiosInstance.get('/productos')).data,
+    })
+
+    await useAuthStore.getState().checkSession()
+
+    expect(clearSpy).not.toHaveBeenCalled()
+    expect(useAuthStore.getState().usuario).toBeNull()
+    expect(useAuthStore.getState().cargando).toBe(false)
+    expect(useAuthStore.getState().error).toBeNull()
+    expect(queryClient.getQueryData(['categorias'])).toEqual([{ id: 1, nombre: 'Hamburguesas' }])
+
+    resolveProductos(
+      createAxiosResponse({ headers: new AxiosHeaders() } as InternalAxiosRequestConfig, 200, productosPayload),
+    )
+
+    await expect(inFlightProductos).resolves.toEqual(productosPayload)
+    expect(queryClient.getQueryData(productosKey)).toEqual(productosPayload)
   })
 
   it('descarta respuestas tardías de checkSession cuando authGeneration cambió por logout/clearSession', async () => {

@@ -119,7 +119,10 @@ export const useAuthStore = create<AuthState>()(
               const disabled = isDisabledAccountError(normalized)
 
               if (status === 401 || disabled) {
-                queryClient.clear()
+                const hadPreviousUser = get().usuario !== null
+                if (hadPreviousUser) {
+                  queryClient.clear()
+                }
                 set({
                   usuario: null,
                   cargando: false,

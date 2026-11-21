@@ -37,7 +37,7 @@ class UserPublic(SQLModel):
     id: int
     username: str
     full_name: str
-    email: EmailStr
+    email: str
     role: str
     disabled: bool
     created_at: datetime

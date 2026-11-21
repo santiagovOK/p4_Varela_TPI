@@ -7,8 +7,10 @@ export {
   crearPedido,
   getPedidoById,
   getPedidos,
+  getResumenPedidos,
   pedidosApi,
 } from './api/pedidosApi'
+export { ResumenCard, type ResumenCardProps, type ResumenCardTone } from './components/ResumenCard'
 export { useCancelarPedido } from './hooks/useCancelarPedido'
 export {
   PEDIDOS_QUERY_KEY,
@@ -18,6 +20,8 @@ export {
 } from './hooks/useCrearPedido'
 export { MIS_PEDIDOS_DEFAULT_LIMIT, useMisPedidos } from './hooks/useMisPedidos'
 export { usePedidoDetalle } from './hooks/usePedidoDetalle'
+export { useResumenPedidos } from './hooks/useResumenPedidos'
+export { AdminResumenPage } from './pages/AdminResumenPage'
 export { CarritoPage } from './pages/CarritoPage'
 export { CheckoutPage } from './pages/CheckoutPage'
 export { MisPedidosPage } from './pages/MisPedidosPage'

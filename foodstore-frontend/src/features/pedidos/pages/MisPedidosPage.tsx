@@ -9,6 +9,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { formatPrecio } from '@/features/productos'
 import { EstadoError, EstadoVacio, Paginacion, Skeleton } from '@/shared/components'
 import { BadgeEstado, Button, Card, Modal } from '@/shared/ui'
+import { useAuthSession } from '@/store/authStore'
 
 import { useCancelarPedido } from '../hooks/useCancelarPedido'
 import { MIS_PEDIDOS_DEFAULT_LIMIT, useMisPedidos } from '../hooks/useMisPedidos'
@@ -45,6 +46,7 @@ function formatFecha(isoDate: string): string {
 /** Vista protegida `/mis-pedidos` con historial paginado, filtro por estado y cancelación en modal. */
 export function MisPedidosPage() {
   const navigate = useNavigate()
+  const { usuario } = useAuthSession()
   const [estadoFiltro, setEstadoFiltro] = useState<EstadoPedido | undefined>(undefined)
   const [skip, setSkip] = useState(0)
   const [confirmedData, setConfirmedData] = useState<PedidosPaginados | undefined>(undefined)
@@ -78,7 +80,7 @@ export function MisPedidosPage() {
   }
 
   function handleOpenCancelModal(pedido: PedidoRead) {
-    if (pedido.estado !== 'PENDIENTE') {
+    if (pedido.usuario_id !== usuario?.id || pedido.estado !== 'PENDIENTE') {
       return
     }
     cancelarMutation.reset()
@@ -94,7 +96,11 @@ export function MisPedidosPage() {
   }
 
   async function handleConfirmCancel() {
-    if (!pedidoACancelar) {
+    if (
+      !pedidoACancelar ||
+      pedidoACancelar.usuario_id !== usuario?.id ||
+      pedidoACancelar.estado !== 'PENDIENTE'
+    ) {
       return
     }
     try {
@@ -236,7 +242,7 @@ export function MisPedidosPage() {
                           Ver detalle
                         </Link>
 
-                        {pedido.estado === 'PENDIENTE' && (
+                        {pedido.usuario_id === usuario?.id && pedido.estado === 'PENDIENTE' && (
                           <Button
                             variant="danger"
                             size="sm"
@@ -264,7 +270,11 @@ export function MisPedidosPage() {
       ) : null}
 
       <Modal
-        isOpen={Boolean(pedidoACancelar)}
+        isOpen={Boolean(
+          pedidoACancelar &&
+            pedidoACancelar.usuario_id === usuario?.id &&
+            pedidoACancelar.estado === 'PENDIENTE',
+        )}
         onClose={handleCloseCancelModal}
         title={pedidoACancelar ? `Cancelar pedido #${pedidoACancelar.id}` : 'Cancelar pedido'}
         isSubmitting={cancelarMutation.isPending}

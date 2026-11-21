@@ -10,6 +10,7 @@ import type {
   PedidoRead,
   PedidosFilterParams,
   PedidosPaginados,
+  ResumenPedidos,
 } from '../types/pedido.types'
 
 /** Crea un nuevo pedido transaccional en el backend (`POST /pedidos`). */
@@ -51,9 +52,16 @@ export async function cancelarPedido(id: number): Promise<PedidoRead> {
   return data
 }
 
+/** Obtiene los indicadores administrativos agregados de pedidos (`GET /pedidos/resumen`). */
+export async function getResumenPedidos(): Promise<ResumenPedidos> {
+  const { data } = await axiosInstance.get<ResumenPedidos>('/pedidos/resumen')
+  return data
+}
+
 export const pedidosApi = {
   crearPedido,
   getPedidos,
   getPedidoById,
   cancelarPedido,
+  getResumenPedidos,
 }

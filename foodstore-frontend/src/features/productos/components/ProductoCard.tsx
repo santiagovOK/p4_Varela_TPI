@@ -3,7 +3,7 @@
  * Trazabilidad (`docs/consignas_tpi.md`):
  * - HU-TPI-02 (págs. 12–14, 18–20): presentación de producto, stock/disponibilidad y `cartStore`.
  */
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { Button, Card } from '@/shared/ui'
 import { useCartStore } from '@/store/cartStore'
@@ -13,6 +13,8 @@ import type { ProductoRead } from '../types/producto.types'
 export interface ProductoCardProps {
   producto: ProductoRead
 }
+
+export const ADD_TO_CART_FEEDBACK_MS = 1200
 
 const ARS_FORMATTER = new Intl.NumberFormat('es-AR', {
   style: 'currency',
@@ -47,6 +49,32 @@ export function formatPrecio(precio: number): string {
 export function ProductoCard({ producto }: ProductoCardProps) {
   const agregar = useCartStore((state) => state.agregar)
   const [failedUrl, setFailedUrl] = useState<string | null>(null)
+  const [agregadoReciente, setAgregadoReciente] = useState(false)
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+    }
+  }, [])
+
+  const handleAgregar = () => {
+    agregar({
+      producto_id: producto.id,
+      nombre: producto.nombre,
+      precio_unitario: producto.precio_base,
+      cantidad: 1,
+    })
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+    }
+    setAgregadoReciente(true)
+    timeoutRef.current = setTimeout(() => {
+      setAgregadoReciente(false)
+    }, ADD_TO_CART_FEEDBACK_MS)
+  }
 
   const normalizedUrl = producto.imagen_url?.trim() ?? null
   const showImage = isValidImageUrl(normalizedUrl) && failedUrl !== normalizedUrl
@@ -114,17 +142,36 @@ export function ProductoCard({ producto }: ProductoCardProps) {
           variant="primary"
           size="sm"
           disabled={sinStock}
-          onClick={() =>
-            agregar({
-              producto_id: producto.id,
-              nombre: producto.nombre,
-              precio_unitario: producto.precio_base,
-              cantidad: 1,
-            })
-          }
+          onClick={handleAgregar}
           aria-label={`Agregar ${producto.nombre} al carrito`}
+          className={`transition-all active:scale-95 ${
+            agregadoReciente
+              ? 'bg-emerald-600 hover:bg-emerald-700 text-white focus-visible:ring-emerald-500 scale-[1.02]'
+              : ''
+          }`.trim()}
         >
-          Agregar al carrito
+          {agregadoReciente ? (
+            <span className="inline-flex items-center gap-1.5">
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                className="h-3.5 w-3.5 shrink-0"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <span>¡Agregado!</span>
+              <span className="sr-only" aria-live="polite">
+                {`${producto.nombre} agregado al carrito`}
+              </span>
+            </span>
+          ) : (
+            'Agregar al carrito'
+          )}
         </Button>
       </div>
     </Card>

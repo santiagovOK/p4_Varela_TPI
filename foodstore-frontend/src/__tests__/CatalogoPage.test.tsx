@@ -4,7 +4,7 @@
  * - HU-TPI-02 (págs. 12–14, 18–20): listado paginado, búsqueda, filtro, imágenes seguras y carrito.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {
   AxiosError,
@@ -16,8 +16,10 @@ import type { ReactNode } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { App } from '@/App'
 import type { CategoriaRead } from '@/features/categorias'
 import {
+  ADD_TO_CART_FEEDBACK_MS,
   CatalogoPage,
   ProductoCard,
   isValidImageUrl,
@@ -25,6 +27,7 @@ import {
 } from '@/features/productos'
 import { AppRoutes } from '@/routes/AppRouter'
 import { axiosInstance } from '@/shared/api/axiosInstance'
+import { queryClient } from '@/shared/api/queryClient'
 import { registerAuthInterceptorHandlers, useAuthStore } from '@/store/authStore'
 import { useCartStore } from '@/store/cartStore'
 
@@ -124,13 +127,15 @@ function renderWithProviders(ui: ReactNode, initialEntries: string[] = ['/']) {
 
 beforeEach(() => {
   localStorage.clear()
+  queryClient.clear()
   registerAuthInterceptorHandlers()
-  useAuthStore.setState({ usuario: null, cargando: false, error: null })
+  useAuthStore.getState().clearSession()
   useCartStore.setState({ items: [] })
 })
 
 afterEach(() => {
   axiosInstance.defaults.adapter = originalAdapter
+  queryClient.clear()
   localStorage.clear()
   vi.restoreAllMocks()
 })
@@ -330,6 +335,34 @@ describe('CatalogoPage (listado, filtros, paginación, carrito y estados)', () =
     expect(screen.getByRole('link', { name: /Carrito/i })).toHaveTextContent('1')
   })
 
+  it('muestra feedback visual "¡Agregado!" al agregar al carrito y vuelve a "Agregar al carrito" tras el tiempo configurado', () => {
+    vi.useFakeTimers()
+    try {
+      render(<ProductoCard producto={PRODUCTOS_MOCK[0]} />)
+
+      const btn = screen.getByRole('button', {
+        name: 'Agregar Hamburguesa Clásica al carrito',
+      })
+      expect(btn).toHaveTextContent('Agregar al carrito')
+
+      fireEvent.click(btn)
+
+      expect(btn).toHaveTextContent('¡Agregado!')
+      expect(screen.getByText('Hamburguesa Clásica agregado al carrito')).toBeInTheDocument()
+
+      act(() => {
+        vi.advanceTimersByTime(ADD_TO_CART_FEEDBACK_MS)
+      })
+
+      expect(btn).toHaveTextContent('Agregar al carrito')
+      expect(
+        screen.queryByText('Hamburguesa Clásica agregado al carrito'),
+      ).not.toBeInTheDocument()
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
   it('muestra EstadoVacio y permite limpiar filtros activos', async () => {
     const user = userEvent.setup()
     axiosInstance.defaults.adapter = vi.fn<AxiosAdapter>(async (config) => {
@@ -415,5 +448,58 @@ describe('CatalogoPage (listado, filtros, paginación, carrito y estados)', () =
     expect(
       screen.getByRole('heading', { name: 'Hamburguesa Clásica' }),
     ).toBeInTheDocument()
+  })
+
+  it('renderiza el catálogo en carga inicial de App como usuario anónimo cuando /auth/me responde 401 antes que /productos', async () => {
+    useAuthStore.setState({ usuario: null, cargando: true, error: null })
+
+    let resolveCategorias!: (res: AxiosResponse) => void
+    let resolveProductos!: (res: AxiosResponse) => void
+    const categoriasPending = new Promise<AxiosResponse>((resolve) => {
+      resolveCategorias = resolve
+    })
+    const productosPending = new Promise<AxiosResponse>((resolve) => {
+      resolveProductos = resolve
+    })
+
+    axiosInstance.defaults.adapter = vi.fn<AxiosAdapter>(async (config) => {
+      if (config.url === '/auth/me') {
+        throw createAxiosHttpError(config, 401, { detail: 'No autenticado' })
+      }
+      if (config.url === '/categorias') {
+        return categoriasPending.then((res) => ({ ...res, config }))
+      }
+      if (config.url === '/productos') {
+        return productosPending.then((res) => ({ ...res, config }))
+      }
+      return createAxiosResponse(config, 404, { detail: 'Not found' })
+    })
+
+    window.history.pushState({}, '', '/')
+    render(
+      <QueryClientProvider client={queryClient}>
+        <App />
+      </QueryClientProvider>,
+    )
+
+    expect(screen.getByRole('status')).toHaveAttribute('aria-busy', 'true')
+
+    await waitFor(() => {
+      expect(useAuthStore.getState().cargando).toBe(false)
+      expect(useAuthStore.getState().usuario).toBeNull()
+    })
+
+    resolveCategorias(createAxiosResponse({} as InternalAxiosRequestConfig, 200, CATEGORIAS_MOCK))
+    resolveProductos(
+      createAxiosResponse({} as InternalAxiosRequestConfig, 200, {
+        total: 1,
+        items: [PRODUCTOS_MOCK[0]],
+      }),
+    )
+
+    expect(
+      await screen.findByRole('heading', { name: 'Hamburguesa Clásica' }),
+    ).toBeInTheDocument()
+    expect(screen.queryByText('Cargando catálogo de productos…')).not.toBeInTheDocument()
   })
 })
