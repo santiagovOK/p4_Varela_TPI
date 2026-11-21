@@ -54,6 +54,13 @@ export interface PedidosPaginados {
   items: PedidoRead[]
 }
 
+/** Parámetros de filtrado y paginación para consultar pedidos (`GET /pedidos`). */
+export interface PedidosFilterParams {
+  skip?: number
+  limit?: number
+  estado?: EstadoPedido
+}
+
 /** DTO de entrada para transición administrativa de estado (`PATCH /pedidos/{id}/estado`). */
 export interface CambioEstado {
   estado: EstadoPedido

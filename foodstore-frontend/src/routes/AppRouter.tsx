@@ -7,6 +7,12 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 
 import { LoginPage, RegisterPage, UnauthorizedPage } from '@/features/auth'
+import {
+  CarritoPage,
+  CheckoutPage,
+  MisPedidosPage,
+  PedidoDetallePage,
+} from '@/features/pedidos'
 import { CatalogoPage } from '@/features/productos'
 import { ProtectedRoute } from '@/shared/components/ProtectedRoute'
 import { MainLayout } from '@/shared/layout'
@@ -34,48 +40,16 @@ export function AppRoutes() {
       <Route element={<MainLayout />}>
         {/* Rutas públicas */}
         <Route path="/" element={<CatalogoPage />} />
-        <Route
-          path="/carrito"
-          element={
-            <RoutePlaceholder
-              title="Carrito"
-              description="Resumen de carrito pendiente de integración en E8.3."
-            />
-          }
-        />
+        <Route path="/carrito" element={<CarritoPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
         {/* Rutas protegidas para usuarios autenticados */}
         <Route element={<ProtectedRoute />}>
-          <Route
-            path="/checkout"
-            element={
-              <RoutePlaceholder
-                title="Confirmar pedido"
-                description="Checkout pendiente de integración en E8.3."
-              />
-            }
-          />
-          <Route
-            path="/mis-pedidos"
-            element={
-              <RoutePlaceholder
-                title="Mis pedidos"
-                description="Historial de pedidos pendiente de integración en E8.4."
-              />
-            }
-          />
-          <Route
-            path="/mis-pedidos/:id"
-            element={
-              <RoutePlaceholder
-                title="Detalle de pedido"
-                description="Detalle de pedido pendiente de integración en E8.4."
-              />
-            }
-          />
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/mis-pedidos" element={<MisPedidosPage />} />
+          <Route path="/mis-pedidos/:id" element={<PedidoDetallePage />} />
         </Route>
 
         {/* Rutas protegidas para administradores */}
