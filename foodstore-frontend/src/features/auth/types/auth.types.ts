@@ -21,3 +21,6 @@ export type RegisterPayload = UserCreate
 export interface LoginResponse {
   message: string
 }
+
+/** Respuesta de cierre de sesión (`POST /auth/logout`). */
+export type LogoutResponse = LoginResponse

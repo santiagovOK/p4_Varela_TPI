@@ -8,8 +8,8 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
+import { useAuth } from '@/features/auth'
 import { Button } from '@/shared/ui'
-import { useAuthSession, useAuthStore } from '@/store/authStore'
 import { useCartCount } from '@/store/cartStore'
 
 const ADMIN_LINKS = [
@@ -25,8 +25,7 @@ const NAV_LINK_CLASSES =
 
 /** Barra de navegación superior sensible al estado de autenticación, rol y carrito. */
 export function Navbar() {
-  const { usuario } = useAuthSession()
-  const logout = useAuthStore((state) => state.logout)
+  const { usuario, logout } = useAuth()
   const cartCount = useCartCount()
   const navigate = useNavigate()
   const [isLoggingOut, setIsLoggingOut] = useState(false)

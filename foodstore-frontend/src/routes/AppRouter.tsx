@@ -6,6 +6,7 @@
  */
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 
+import { LoginPage, RegisterPage, UnauthorizedPage } from '@/features/auth'
 import { ProtectedRoute } from '@/shared/components/ProtectedRoute'
 import { MainLayout } from '@/shared/layout'
 
@@ -49,33 +50,9 @@ export function AppRoutes() {
             />
           }
         />
-        <Route
-          path="/login"
-          element={
-            <RoutePlaceholder
-              title="Iniciar sesión"
-              description="Formulario de acceso pendiente de integración en E8.1."
-            />
-          }
-        />
-        <Route
-          path="/register"
-          element={
-            <RoutePlaceholder
-              title="Crear cuenta"
-              description="Formulario de registro pendiente de integración en E8.1."
-            />
-          }
-        />
-        <Route
-          path="/unauthorized"
-          element={
-            <RoutePlaceholder
-              title="Acceso no autorizado"
-              description="No tenés permisos para acceder a esta sección."
-            />
-          }
-        />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
         {/* Rutas protegidas para usuarios autenticados */}
         <Route element={<ProtectedRoute />}>
