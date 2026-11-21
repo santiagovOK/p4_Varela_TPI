@@ -1,7 +1,15 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './index.css'
+import { QueryClientProvider } from '@tanstack/react-query'
+
+import { setupInterceptors } from '@/shared/api/axiosInstance'
+import { queryClient } from '@/shared/api/queryClient'
+import { registerAuthInterceptorHandlers } from '@/store/authStore'
 import App from './App'
+import './index.css'
+
+setupInterceptors()
+registerAuthInterceptorHandlers()
 
 const rootElement = document.getElementById('root')
 if (!rootElement) {
@@ -10,6 +18,8 @@ if (!rootElement) {
 
 createRoot(rootElement).render(
   <StrictMode>
-    <App />
+    <QueryClientProvider client={queryClient}>
+      <App />
+    </QueryClientProvider>
   </StrictMode>,
 )
