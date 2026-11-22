@@ -7,6 +7,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 
 import { LoginPage, RegisterPage, UnauthorizedPage } from '@/features/auth'
+import { AdminCategoriasPage } from '@/features/categorias'
 import {
   AdminResumenPage,
   CarritoPage,
@@ -14,7 +15,7 @@ import {
   MisPedidosPage,
   PedidoDetallePage,
 } from '@/features/pedidos'
-import { CatalogoPage } from '@/features/productos'
+import { AdminProductosPage, CatalogoPage } from '@/features/productos'
 import { ProtectedRoute } from '@/shared/components/ProtectedRoute'
 import { MainLayout } from '@/shared/layout'
 
@@ -56,24 +57,8 @@ export function AppRoutes() {
         {/* Rutas protegidas para administradores */}
         <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
           <Route path="/admin/resumen" element={<AdminResumenPage />} />
-          <Route
-            path="/admin/categorias"
-            element={
-              <RoutePlaceholder
-                title="Gestión de categorías"
-                description="ABM de categorías pendiente de integración en E9.2."
-              />
-            }
-          />
-          <Route
-            path="/admin/productos"
-            element={
-              <RoutePlaceholder
-                title="Gestión de productos"
-                description="ABM de productos pendiente de integración en E9.2."
-              />
-            }
-          />
+          <Route path="/admin/categorias" element={<AdminCategoriasPage />} />
+          <Route path="/admin/productos" element={<AdminProductosPage />} />
           <Route
             path="/admin/pedidos"
             element={
