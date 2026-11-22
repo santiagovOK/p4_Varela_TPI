@@ -81,12 +81,25 @@ export function Navbar() {
               </Link>
             )}
 
-            {usuario?.role === 'admin' &&
-              ADMIN_LINKS.map((item) => (
-                <Link key={item.to} to={item.to} className={NAV_LINK_CLASSES}>
-                  {item.label}
-                </Link>
-              ))}
+            {usuario?.role === 'admin' && (
+              <>
+                <span
+                  aria-hidden="true"
+                  className="hidden h-5 w-px bg-slate-200 sm:mx-1.5 sm:block"
+                />
+                <div
+                  role="group"
+                  aria-label="Gestión administrativa"
+                  className="flex flex-wrap items-center gap-1 rounded-lg border border-slate-200/80 bg-slate-100/80 px-1.5 py-1 shadow-2xs"
+                >
+                  {ADMIN_LINKS.map((item) => (
+                    <Link key={item.to} to={item.to} className={NAV_LINK_CLASSES}>
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         </div>
 

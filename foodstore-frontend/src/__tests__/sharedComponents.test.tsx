@@ -1,5 +1,5 @@
 import { QueryClientProvider } from '@tanstack/react-query'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { AxiosAdapter, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import { MemoryRouter } from 'react-router-dom'
@@ -316,10 +316,11 @@ describe('Layout Navbar y MainLayout integrados en AppRoutes', () => {
     expect(screen.getByRole('link', { name: 'Registrarse' })).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Mis pedidos' })).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Usuarios' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('group', { name: 'Gestión administrativa' })).not.toBeInTheDocument()
     expect(screen.getAllByRole('main')).toHaveLength(1)
   })
 
-  it('oculta enlaces admin para rol user y los muestra junto a nombre/rol para admin', () => {
+  it('oculta enlaces admin para rol user y los muestra agrupados semántica y visualmente para admin', () => {
     useAuthStore.setState({ usuario: USER_CLIENTE, cargando: false, error: null })
 
     const { rerender } = render(
@@ -335,6 +336,7 @@ describe('Layout Navbar y MainLayout integrados en AppRoutes', () => {
     expect(screen.getByRole('link', { name: 'Mis pedidos' })).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Resumen' })).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Usuarios' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('group', { name: 'Gestión administrativa' })).not.toBeInTheDocument()
 
     useAuthStore.setState({ usuario: USER_ADMIN, cargando: false, error: null })
     rerender(
@@ -347,20 +349,45 @@ describe('Layout Navbar y MainLayout integrados en AppRoutes', () => {
 
     expect(screen.getByText('Admin FoodStore')).toBeInTheDocument()
     expect(screen.getByText('Admin')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Resumen' })).toHaveAttribute('href', '/admin/resumen')
-    expect(screen.getByRole('link', { name: 'Categorías' })).toHaveAttribute(
+
+    const adminGroup = screen.getByRole('group', { name: 'Gestión administrativa' })
+    expect(adminGroup).toBeInTheDocument()
+    expect(adminGroup).toHaveClass(
+      'border',
+      'border-slate-200/80',
+      'bg-slate-100/80',
+      'shadow-2xs',
+      'rounded-lg',
+    )
+
+    const adminScope = within(adminGroup)
+    expect(adminScope.getByRole('link', { name: 'Resumen' })).toHaveAttribute(
+      'href',
+      '/admin/resumen',
+    )
+    expect(adminScope.getByRole('link', { name: 'Categorías' })).toHaveAttribute(
       'href',
       '/admin/categorias',
     )
-    expect(screen.getByRole('link', { name: 'Productos' })).toHaveAttribute(
+    expect(adminScope.getByRole('link', { name: 'Productos' })).toHaveAttribute(
       'href',
       '/admin/productos',
     )
-    expect(screen.getByRole('link', { name: 'Pedidos' })).toHaveAttribute('href', '/admin/pedidos')
-    expect(screen.getByRole('link', { name: 'Usuarios' })).toHaveAttribute(
+    expect(adminScope.getByRole('link', { name: 'Pedidos' })).toHaveAttribute(
+      'href',
+      '/admin/pedidos',
+    )
+    expect(adminScope.getByRole('link', { name: 'Usuarios' })).toHaveAttribute(
       'href',
       '/admin/usuarios',
     )
+    expect(adminScope.queryByRole('link', { name: 'Catálogo' })).not.toBeInTheDocument()
+    expect(adminScope.queryByRole('link', { name: /Carrito/ })).not.toBeInTheDocument()
+    expect(adminScope.queryByRole('link', { name: 'Mis pedidos' })).not.toBeInTheDocument()
+
+    const mainNav = screen.getByRole('navigation', { name: 'Navegación principal' })
+    const separator = mainNav.querySelector('[aria-hidden="true"].hidden.sm\\:block')
+    expect(separator).toBeInTheDocument()
   })
 
   it('Cerrar sesión en Navbar invoca logout, limpia sesión y redirige a /login', async () => {
