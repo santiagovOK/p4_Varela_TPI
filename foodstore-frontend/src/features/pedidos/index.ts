@@ -3,6 +3,7 @@
  * Trazabilidad (`docs/consignas_tpi.md`): sección "Arquitectura por features" (págs. 17–18).
  */
 export {
+  cambiarEstadoPedido,
   cancelarPedido,
   crearPedido,
   getPedidoById,
@@ -11,6 +12,11 @@ export {
   pedidosApi,
 } from './api/pedidosApi'
 export { ResumenCard, type ResumenCardProps, type ResumenCardTone } from './components/ResumenCard'
+export {
+  ADMIN_PEDIDOS_QUERY_KEY,
+  useAdminPedidos,
+  type CambiarEstadoPedidoVariables,
+} from './hooks/useAdminPedidos'
 export { useCancelarPedido } from './hooks/useCancelarPedido'
 export {
   PEDIDOS_QUERY_KEY,
@@ -21,6 +27,7 @@ export {
 export { MIS_PEDIDOS_DEFAULT_LIMIT, useMisPedidos } from './hooks/useMisPedidos'
 export { usePedidoDetalle } from './hooks/usePedidoDetalle'
 export { useResumenPedidos } from './hooks/useResumenPedidos'
+export { AdminPedidosPage } from './pages/AdminPedidosPage'
 export { AdminResumenPage } from './pages/AdminResumenPage'
 export { CarritoPage } from './pages/CarritoPage'
 export { CheckoutPage } from './pages/CheckoutPage'

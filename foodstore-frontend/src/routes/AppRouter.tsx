@@ -9,6 +9,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { LoginPage, RegisterPage, UnauthorizedPage } from '@/features/auth'
 import { AdminCategoriasPage } from '@/features/categorias'
 import {
+  AdminPedidosPage,
   AdminResumenPage,
   CarritoPage,
   CheckoutPage,
@@ -16,24 +17,9 @@ import {
   PedidoDetallePage,
 } from '@/features/pedidos'
 import { AdminProductosPage, CatalogoPage } from '@/features/productos'
+import { AdminUsuariosPage } from '@/features/usuarios'
 import { ProtectedRoute } from '@/shared/components/ProtectedRoute'
 import { MainLayout } from '@/shared/layout'
-
-interface RoutePlaceholderProps {
-  title: string
-  description: string
-}
-
-function RoutePlaceholder({ title, description }: RoutePlaceholderProps) {
-  return (
-    <section className="flex min-h-[50vh] items-center justify-center p-6">
-      <div className="max-w-lg text-center space-y-2">
-        <h1 className="text-2xl font-bold">{title}</h1>
-        <p className="text-sm text-slate-600">{description}</p>
-      </div>
-    </section>
-  )
-}
 
 /** Tabla declarativa de rutas de la aplicación (apta para `MemoryRouter` en tests). */
 export function AppRoutes() {
@@ -59,24 +45,8 @@ export function AppRoutes() {
           <Route path="/admin/resumen" element={<AdminResumenPage />} />
           <Route path="/admin/categorias" element={<AdminCategoriasPage />} />
           <Route path="/admin/productos" element={<AdminProductosPage />} />
-          <Route
-            path="/admin/pedidos"
-            element={
-              <RoutePlaceholder
-                title="Gestión de pedidos"
-                description="Panel de pedidos pendiente de integración en E9.3."
-              />
-            }
-          />
-          <Route
-            path="/admin/usuarios"
-            element={
-              <RoutePlaceholder
-                title="Gestión de usuarios"
-                description="Panel de usuarios pendiente de integración en E9.4."
-              />
-            }
-          />
+          <Route path="/admin/pedidos" element={<AdminPedidosPage />} />
+          <Route path="/admin/usuarios" element={<AdminUsuariosPage />} />
         </Route>
       </Route>
 

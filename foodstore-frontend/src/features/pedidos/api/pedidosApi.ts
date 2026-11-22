@@ -6,6 +6,7 @@
 import { axiosInstance } from '@/shared/api/axiosInstance'
 
 import type {
+  EstadoPedido,
   PedidoCreate,
   PedidoRead,
   PedidosFilterParams,
@@ -58,10 +59,22 @@ export async function getResumenPedidos(): Promise<ResumenPedidos> {
   return data
 }
 
+/** Transiciona el estado de un pedido como administrador según `RN-02` (`PATCH /pedidos/{id}/estado`). */
+export async function cambiarEstadoPedido(
+  id: number,
+  estado: EstadoPedido,
+): Promise<PedidoRead> {
+  const { data } = await axiosInstance.patch<PedidoRead>(`/pedidos/${id}/estado`, {
+    estado,
+  })
+  return data
+}
+
 export const pedidosApi = {
   crearPedido,
   getPedidos,
   getPedidoById,
   cancelarPedido,
   getResumenPedidos,
+  cambiarEstadoPedido,
 }
