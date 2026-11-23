@@ -1,6 +1,6 @@
 /**
  * Diálogo modal controlado con accesibilidad WAI-ARIA y bloqueo durante envíos en curso.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Tabla "Componentes compartidos — shared/ui/" (pág. 18): `Modal`.
  */
 import { useEffect, useId, type ReactNode } from 'react'

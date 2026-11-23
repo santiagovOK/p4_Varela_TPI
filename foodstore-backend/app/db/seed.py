@@ -1,6 +1,6 @@
 """Seed idempotente TPI para Food Store (E1.3 / CE-04).
 
-Consigna TPI (docs/consignas_tpi.md):
+Consigna TPI (docs/consignas_tpi.pdf):
 - Invocable directamente de forma manual mediante ``python -m app.db.seed`` sin
   depender de ``setup.sh``.
 - Inicializa el esquema si la base está vacía (``create_all_tables``).

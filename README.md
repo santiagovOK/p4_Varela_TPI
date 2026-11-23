@@ -5,7 +5,7 @@
 **Email institucional:** santiago.varela@tupad.utn.edu.ar
 
 - **Repositorio GitHub:** https://github.com/santiagovOK/p4_Varela_TPI
-- **Consigna normativa:** [consignas_tpi.md](docs/consignas_tpi.md) ([PDF](docs/consignas_tpi.pdf))
+- **Consigna normativa:** [consignas_tpi.pdf](docs/consignas_tpi.pdf)
 - **Modelo objetivo:** [UML Food Store](docs/tpi_UML_Food_Store.svg)
 - **Plan, arquitectura y trazabilidad:** [resolucion_tpi.md](docs/resolucion_tpi.md)
 - **Diagrama RBAC y seguridad:** [diagrama_rbac.mmd](docs/diagrama_rbac.mmd)
@@ -124,7 +124,7 @@ El archivo `foodstore-frontend/.env.example` ya define `VITE_API_URL=http://loca
 
 ## Elementos adicionales respecto al cumplimiento estricto de las consignas
 
-Además de satisfacer íntegramente las diez rúbricas, las reglas de negocio (`RN-01` a `RN-06`) y los requisitos de arquitectura de [consignas_tpi.md](docs/consignas_tpi.md), el proyecto incorpora un conjunto de controles defensivos, validaciones de borde y medidas de robustez documental y técnica. El flujo completo de roles, guardias de ruta y barreras de autorización se detalla en el diagrama [docs/diagrama_rbac.mmd](docs/diagrama_rbac.mmd).
+Además de satisfacer íntegramente las diez rúbricas, las reglas de negocio (`RN-01` a `RN-06`) y los requisitos de arquitectura de [consignas_tpi.pdf](docs/consignas_tpi.pdf), el proyecto incorpora un conjunto de controles defensivos, validaciones de borde y medidas de robustez documental y técnica. El flujo completo de roles, guardias de ruta y barreras de autorización se detalla en el diagrama [docs/diagrama_rbac.mmd](docs/diagrama_rbac.mmd).
 
 1. **Límite defensivo en notas de checkout (`NOTAS_MAX_LENGTH = 500`):**  
    Aunque la consigna define `notas` como campo opcional sin cota explícita, `foodstore-frontend/src/features/pedidos/validation/checkoutValidation.ts` establece `NOTAS_MAX_LENGTH = 500` y valida el texto tras `.trim()` en `validateNotas`, evitando envíos desmedidos desde el formulario de checkout.

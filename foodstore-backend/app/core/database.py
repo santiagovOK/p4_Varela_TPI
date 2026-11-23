@@ -1,6 +1,6 @@
 """Configuración del motor de base de datos, fábrica de sesiones y creación de tablas.
 
-Consigna TPI (docs/consignas_tpi.md):
+Consigna TPI (docs/consignas_tpi.pdf):
 - Componentes del núcleo (app/core/database.py): engine, create_all_tables y
   session_factory consumiendo settings.DATABASE_URL desde app.core.config.
 - Stack del backend: SQLModel sobre PostgreSQL (psycopg2-binary) con soporte

@@ -1,6 +1,6 @@
 /**
  * Cliente HTTP tipado para los endpoints de pedidos (`/pedidos/*`).
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Reglas `RN-03`, `RN-04`, `RN-05` y tablas "Pedidos" / "Rutas y pantallas" (págs. 5, 13–14, 17–20).
  */
 import { axiosInstance } from '@/shared/api/axiosInstance'

@@ -1,6 +1,6 @@
 """Router FastAPI para gestión administrativa de usuarios (`/api/v1/admin/usuarios/*`).
 
-Consigna TPI (docs/consignas_tpi.md):
+Consigna TPI (docs/consignas_tpi.pdf):
 - GET /api/v1/admin/usuarios -> 200 list[UserPublic] (incluye cuentas desactivadas).
 - POST /api/v1/admin/usuarios/{id}/activar -> 200 UserPublic (idempotente) / 404.
 - POST /api/v1/admin/usuarios/{id}/desactivar -> 200 UserPublic (idempotente) / 404 / 400 auto-desactivación.

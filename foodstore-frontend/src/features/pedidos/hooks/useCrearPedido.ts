@@ -1,6 +1,6 @@
 /**
  * Hook de mutación para crear pedidos con normalización de errores e invalidación cruzada.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Regla `RN-01` (descuento transaccional de stock) y sección "Estado, datos y sesión" (págs. 5, 13, 17, 19–20).
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query'

@@ -1,6 +1,6 @@
 """Servicio de lógica de negocio para el módulo de Pedidos.
 
-Consigna TPI (docs/consignas_tpi.md):
+Consigna TPI (docs/consignas_tpi.pdf):
 - Arquitectura en capas: Routers -> Services -> Unit of Work -> Repositories -> Models.
 - Regla del Unit of Work: el servicio coordina transacciones mediante
   ``with self.uow as uow:``, nunca invoca ``session.commit()`` y construye

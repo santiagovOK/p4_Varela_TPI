@@ -1,6 +1,6 @@
 /**
  * Modal controlado con TanStack Form para alta y edición de categorías (`HU-TPI-04`).
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Sección "Formularios" y "Componentes compartidos — Modal" (págs. 18–20).
  */
 import { useForm } from '@tanstack/react-form'

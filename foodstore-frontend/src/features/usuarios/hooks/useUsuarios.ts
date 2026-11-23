@@ -1,6 +1,6 @@
 /**
  * Hook administrativo de usuarios con TanStack Query (`useQuery` + `useMutation`).
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Historia `HU-TPI-06`, ruta `/admin/usuarios` y sección "Estado, datos y sesión" (págs. 17–20).
  */
 import { useMutation, useQuery } from '@tanstack/react-query'

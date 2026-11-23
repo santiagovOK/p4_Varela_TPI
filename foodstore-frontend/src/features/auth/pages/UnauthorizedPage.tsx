@@ -1,6 +1,6 @@
 /**
  * Pantalla accesible de acceso denegado (rol insuficiente) con retorno al catálogo inicial.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Tabla "Rutas y pantallas" (`/unauthorized` — «Mensaje y enlace al inicio», págs. 18 y 20).
  */
 import { Link } from 'react-router-dom'

@@ -1,6 +1,6 @@
 /**
  * Tabla administrativa de usuarios construida con `@tanstack/react-table` (`HU-TPI-06`).
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Ruta `/admin/usuarios`, historia `HU-TPI-06` y sección "Tablas" (págs. 18–20).
  */
 import {

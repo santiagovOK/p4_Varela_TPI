@@ -1,6 +1,6 @@
 /**
  * Tarjeta semántica de indicador para el resumen administrativo de pedidos.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Historia `HU-TPI-05` y ruta `/admin/resumen` (págs. 14, 18–20).
  */
 import { Card } from '@/shared/ui'

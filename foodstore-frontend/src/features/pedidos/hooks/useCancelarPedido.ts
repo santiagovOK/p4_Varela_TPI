@@ -1,6 +1,6 @@
 /**
  * Hook de mutación para cancelar un pedido `PENDIENTE` con invalidación cruzada.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Reglas `RN-03` (restitución transaccional de stock) y `RN-04` (solo propietario en `PENDIENTE`, págs. 5, 13–14, 19–20).
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query'

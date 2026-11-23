@@ -1,6 +1,6 @@
 /**
  * Estado vacío accesible con descripción y acción contextual opcional.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Tabla "Componentes compartidos — shared/components/" (págs. 18–19): `EstadoVacio`.
  */
 import type { ReactNode } from 'react'

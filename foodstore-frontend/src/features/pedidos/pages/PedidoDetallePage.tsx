@@ -1,6 +1,6 @@
 /**
  * Página de detalle inmutable de un pedido del cliente con líneas snapshot y cancelación.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Reglas `RN-03`, `RN-04`, `RN-05`, historia `HU-TPI-03` y ruta `/mis-pedidos/:id` (págs. 5, 13–14, 18–20).
  */
 import { useState } from 'react'

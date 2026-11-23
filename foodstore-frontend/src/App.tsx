@@ -1,6 +1,6 @@
 /**
  * Componente raíz de composición entre verificación de sesión (`AuthProvider`) y rutas (`AppRouter`).
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Sección "Estructura de carpetas del frontend — App.tsx" (pág. 19).
  */
 import { AuthProvider } from '@/features/auth'

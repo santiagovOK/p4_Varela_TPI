@@ -1,6 +1,6 @@
 /**
  * Página principal del catálogo público con búsqueda, filtro por categoría y paginación remota.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - HU-TPI-02 (págs. 12–14, 18–20): ruta `/`, búsqueda, filtro por categoría y paginación.
  */
 import { useRef, useState, type ChangeEvent } from 'react'

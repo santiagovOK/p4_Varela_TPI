@@ -1,6 +1,6 @@
 /**
  * Página de inicio de sesión con `@tanstack/react-form` y mutación vía `useAuth`.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Tablas "Rutas y pantallas" (`/login`), "Formularios" y "Estado, datos y sesión" (págs. 18–20).
  */
 import { useForm } from '@tanstack/react-form'

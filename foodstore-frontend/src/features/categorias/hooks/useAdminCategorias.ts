@@ -1,6 +1,6 @@
 /**
  * Hook TanStack Query para la administración ABM de categorías con invalidación cruzada y `removeQueries`.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Historia `HU-TPI-04` y sección "Estado, datos y sesión" (págs. 14, 17–19).
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'

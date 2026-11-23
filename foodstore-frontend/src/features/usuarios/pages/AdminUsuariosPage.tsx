@@ -1,6 +1,6 @@
 /**
  * Página administrativa `/admin/usuarios` con buscador, TanStack Query y `UsuariosTable` (`HU-TPI-06`).
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Ruta `/admin/usuarios`, historia `HU-TPI-06` y sección "Tablas" (págs. 18–20).
  */
 import type { PaginationState } from '@tanstack/react-table'

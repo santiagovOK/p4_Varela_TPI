@@ -1,6 +1,6 @@
 /**
  * Barrel público de la feature `usuarios`.
- * Trazabilidad (`docs/consignas_tpi.md`): sección "Arquitectura por features" (págs. 17–18).
+ * Trazabilidad (`docs/consignas_tpi.pdf`): sección "Arquitectura por features" (págs. 17–18).
  */
 export { activarUsuario, desactivarUsuario, getUsuariosAdmin } from './api/usuariosApi'
 export { UsuariosTable } from './components/UsuariosTable'

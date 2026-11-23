@@ -1,6 +1,6 @@
 /**
  * Hook TanStack Query para consultar el historial paginado de pedidos propios.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Regla `RN-04`, historia `HU-TPI-03` y ruta `/mis-pedidos` (págs. 5, 13–14, 18–20).
  */
 import { keepPreviousData, useQuery } from '@tanstack/react-query'

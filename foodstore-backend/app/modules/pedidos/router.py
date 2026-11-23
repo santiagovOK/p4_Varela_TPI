@@ -1,7 +1,7 @@
 """Router HTTP para el módulo de Pedidos (`/api/v1/pedidos/*`).
 
 El prefijo global `/api/v1` se aplica al montar este router en `app/main.py`
-(docs/consignas_tpi.md: app/main.py y API REST — Convenciones).
+(docs/consignas_tpi.pdf: app/main.py y API REST — Convenciones).
 """
 
 from typing import Annotated

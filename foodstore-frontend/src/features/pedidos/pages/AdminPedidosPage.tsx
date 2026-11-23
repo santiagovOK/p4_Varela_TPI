@@ -1,7 +1,7 @@
 /**
  * Página administrativa `/admin/pedidos` con TanStack Table, filtros, máquina de estados `RN-02`
  * y modal de detalle snapshot `RN-05` (`HU-TPI-05`).
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Ruta `/admin/pedidos`, reglas `RN-02`, `RN-03`, `RN-05` y sección "Tablas" (págs. 5, 14, 18–20).
  */
 import {

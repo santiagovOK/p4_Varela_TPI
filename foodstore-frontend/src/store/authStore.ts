@@ -1,6 +1,6 @@
 /**
  * Store global de sesión del usuario autenticado (Zustand + `persist` con `partialize`).
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Sección "Estado, datos y sesión — authStore y Logout" (págs. 18 y 20): persiste
  *   exclusivamente `usuario` (nunca el JWT) y coordina `login`, `logout` y `checkSession` (`/auth/me`).
  */

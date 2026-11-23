@@ -1,6 +1,6 @@
 /**
  * Contenedor visual base para agrupar contenido de catálogo, resumen o formularios.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Tabla "Componentes compartidos — shared/ui/" (pág. 18): `Card`.
  */
 import type { HTMLAttributes, ReactNode } from 'react'

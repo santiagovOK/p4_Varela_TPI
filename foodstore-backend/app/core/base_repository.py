@@ -1,6 +1,6 @@
 """Repositorio genérico base sobre SQLModel para acceso a datos sin commits.
 
-Consigna TPI (docs/consignas_tpi.md):
+Consigna TPI (docs/consignas_tpi.pdf):
 - Arquitectura en capas: Routers -> Services -> Unit of Work -> Repositories -> Models.
 - Unit of Work y Repository: BaseRepository[T] concentra operaciones CRUD comunes.
 - Regla del Unit of Work: los repositorios solo usan add, flush, refresh y delete;
@@ -23,7 +23,7 @@ class BaseRepository(Generic[T]):
 
     Encapsula las operaciones de persistencia sobre una ``Session`` compartida
     sin confirmar transacciones (sin ``commit``), siguiendo el patrón
-    Repository + Unit of Work definido en ``docs/consignas_tpi.md``.
+    Repository + Unit of Work definido en ``docs/consignas_tpi.pdf``.
     """
 
     def __init__(self, session: Session, model: type[T]) -> None:

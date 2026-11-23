@@ -1,6 +1,6 @@
 /**
  * Hook TanStack Query para listar productos paginados del catálogo público.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Sección "Arquitectura por features — hooks/" y "Estado, datos y sesión" (págs. 17–18).
  */
 import { keepPreviousData, useQuery } from '@tanstack/react-query'

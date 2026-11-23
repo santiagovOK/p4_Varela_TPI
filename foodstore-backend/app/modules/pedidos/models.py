@@ -1,6 +1,6 @@
 """Modelos de dominio SQLModel para Pedidos y Detalle de Pedidos.
 
-Consigna TPI (docs/consignas_tpi.md):
+Consigna TPI (docs/consignas_tpi.pdf):
 - Entidades Pedido y DetallePedido: tablas `pedidos` y `detalle_pedidos` con
   relaciones UML `Usuario.pedidos`/`Pedido.usuario`, `Pedido.items`/`DetallePedido.pedido`
   y `Producto.detalles`/`DetallePedido.producto`.
@@ -49,7 +49,7 @@ class Pedido(SQLModel, table=True):
         nullable=False,
     )
 
-    # Relaciones UML (docs/consignas_tpi.md: Pedido.usuario y Pedido.items).
+    # Relaciones UML (docs/consignas_tpi.pdf: Pedido.usuario y Pedido.items).
     usuario: Optional["Usuario"] = Relationship(back_populates="pedidos")
     items: list["DetallePedido"] = Relationship(
         back_populates="pedido",
@@ -79,7 +79,7 @@ class DetallePedido(SQLModel, table=True):
     precio_unitario: float = Field(ge=0, nullable=False)
     subtotal: float = Field(ge=0, nullable=False)
 
-    # Relaciones UML (docs/consignas_tpi.md: DetallePedido.pedido y DetallePedido.producto).
+    # Relaciones UML (docs/consignas_tpi.pdf: DetallePedido.pedido y DetallePedido.producto).
     pedido: Optional["Pedido"] = Relationship(back_populates="items")
     producto: Optional["Producto"] = Relationship(back_populates="detalles")
 

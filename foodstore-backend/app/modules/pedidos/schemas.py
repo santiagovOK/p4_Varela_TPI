@@ -1,6 +1,6 @@
 """Schemas SQLModel (DTOs) para el módulo de Pedidos.
 
-Consigna TPI (docs/consignas_tpi.md):
+Consigna TPI (docs/consignas_tpi.pdf):
 - Máquina de estados (`EstadoPedido`): `PENDIENTE`, `EN_PREPARACION`, `ENTREGADO`,
   `CANCELADO` (RN-02).
 - RN-01: `PedidoCreate` requiere al menos un ítem (`items` con `min_length=1`).

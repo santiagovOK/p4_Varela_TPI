@@ -1,6 +1,6 @@
 /**
  * Hook TanStack Query para consultar el resumen administrativo de pedidos.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Historia `HU-TPI-05`, endpoint `GET /pedidos/resumen` y ruta `/admin/resumen` (págs. 14, 18–20).
  */
 import { useQuery } from '@tanstack/react-query'

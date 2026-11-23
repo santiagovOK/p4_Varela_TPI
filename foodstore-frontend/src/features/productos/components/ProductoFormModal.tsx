@@ -1,6 +1,6 @@
 /**
  * Modal controlado con TanStack Form para alta y edición de productos (`HU-TPI-04`).
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Sección "Formularios", relación 1:N `Producto -> Categoria` y validación segura de `imagen_url` (págs. 14, 18–20).
  */
 import { useForm } from '@tanstack/react-form'

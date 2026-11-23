@@ -1,6 +1,6 @@
 /**
  * Tarjeta de producto del catálogo público con validación segura de imagen y acceso al carrito.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - HU-TPI-02 (págs. 12–14, 18–20): presentación de producto, stock/disponibilidad y `cartStore`.
  */
 import { useEffect, useRef, useState } from 'react'

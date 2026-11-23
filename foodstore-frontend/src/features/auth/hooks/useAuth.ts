@@ -1,6 +1,6 @@
 /**
  * Hook unificado de autenticación: expone estado de sesión y mutaciones TanStack Query.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Secciones "Arquitectura por features" y "Estado, datos y sesión" (págs. 17 y 20).
  */
 import { useMutation } from '@tanstack/react-query'

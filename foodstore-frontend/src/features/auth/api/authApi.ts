@@ -1,6 +1,6 @@
 /**
  * Cliente HTTP tipado para los endpoints de autenticación (`/auth/*`).
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Tablas "Auth y usuarios" y "Rutas y pantallas" (págs. 11–12 y 17–18).
  */
 import { axiosInstance } from '@/shared/api/axiosInstance'

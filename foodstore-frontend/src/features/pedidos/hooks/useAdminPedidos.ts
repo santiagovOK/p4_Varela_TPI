@@ -1,6 +1,6 @@
 /**
  * Hook administrativo para listar pedidos y ejecutar transiciones de estado (`RN-02`, `RN-03`).
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Historia `HU-TPI-05`, ruta `/admin/pedidos` y regla `RN-02` (págs. 5, 14, 18–20).
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'

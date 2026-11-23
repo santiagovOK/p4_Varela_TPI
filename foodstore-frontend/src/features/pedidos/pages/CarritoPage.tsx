@@ -1,6 +1,6 @@
 /**
  * Pantalla pública del carrito de compras (`/carrito`) conectada a `cartStore`.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - HU-TPI-02, HU-TPI-03 y tabla "Rutas y pantallas" (`/carrito`, págs. 18–20).
  */
 import { useNavigate } from 'react-router-dom'

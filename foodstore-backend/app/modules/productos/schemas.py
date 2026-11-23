@@ -1,6 +1,6 @@
 """Schemas SQLModel (DTOs) para el módulo de Productos.
 
-Consigna TPI (docs/consignas_tpi.md):
+Consigna TPI (docs/consignas_tpi.pdf):
 - Schemas Producto: `ProductoCreate`, `ProductoUpdate` (actualización parcial),
   `ProductoRead` (con `categoria: CategoriaRead`), `ProductoStockUpdate` y
   `ProductosPaginados` (`{total, items}`).

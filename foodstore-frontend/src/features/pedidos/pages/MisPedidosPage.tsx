@@ -1,6 +1,6 @@
 /**
  * Página del historial de pedidos del cliente autenticado con filtro, paginación y cancelación.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Reglas `RN-03`, `RN-04`, historia `HU-TPI-03` y ruta `/mis-pedidos` (págs. 5, 13–14, 18–20).
  */
 import { useState, type ChangeEvent } from 'react'

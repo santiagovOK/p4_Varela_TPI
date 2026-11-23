@@ -1,6 +1,6 @@
 /**
  * Campo de entrada accesible con etiqueta asociada, texto de ayuda y error por campo.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Tabla "Componentes compartidos — shared/ui/" (pág. 18): `Input`.
  */
 import { useId, type InputHTMLAttributes, type Ref } from 'react'

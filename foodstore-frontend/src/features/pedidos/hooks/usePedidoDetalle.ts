@@ -1,6 +1,6 @@
 /**
  * Hook TanStack Query para consultar el detalle inmutable de un pedido por ID.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Reglas `RN-04`, `RN-05`, historia `HU-TPI-03` y ruta `/mis-pedidos/:id` (págs. 5, 13–14, 18–20).
  */
 import { useQuery } from '@tanstack/react-query'

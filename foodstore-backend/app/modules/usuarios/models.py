@@ -1,6 +1,6 @@
 """Modelo de dominio SQLModel para Usuarios.
 
-Consigna TPI (docs/consignas_tpi.md):
+Consigna TPI (docs/consignas_tpi.pdf):
 - Modelo de dominio Usuario: tabla `usuarios` con `id`, `username` (único),
   `full_name`, `email` (único), `hashed_password`, `role`, `disabled` y
   `created_at`.
@@ -52,7 +52,7 @@ class Usuario(SQLModel, table=True):
         nullable=False,
     )
 
-    # Relación 1:N con Pedido (docs/consignas_tpi.md: Modelos y relaciones Usuario.pedidos).
+    # Relación 1:N con Pedido (docs/consignas_tpi.pdf: Modelos y relaciones Usuario.pedidos).
     pedidos: list["Pedido"] = Relationship(back_populates="usuario")
 
 

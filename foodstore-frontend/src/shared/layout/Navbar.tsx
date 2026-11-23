@@ -1,6 +1,6 @@
 /**
  * Barra de navegación principal con enlaces públicos, estado del carrito, sesión y accesos admin.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Tabla "Componentes compartidos — shared/layout/" (pág. 18): `Navbar` con nombre, rol,
  *   «Cerrar sesión» y acceso al panel solo para `admin`.
  * - Tabla "Rutas y pantallas" (págs. 19–20) y "Estado, datos y sesión — Logout" (pág. 20).

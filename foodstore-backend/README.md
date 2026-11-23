@@ -1,6 +1,6 @@
 # Food Store — Backend
 
-Backend de Food Store TPI, desarrollado con FastAPI, SQLModel y PostgreSQL. La fuente normativa del TPI y su plan son [la consigna](../docs/consignas_tpi.md) y la [resolución TPI](../docs/resolucion_tpi.md).
+Backend de Food Store TPI, desarrollado con FastAPI, SQLModel y PostgreSQL. La fuente normativa del TPI y su plan son [la consigna](../docs/consignas_tpi.pdf) y la [resolución TPI](../docs/resolucion_tpi.md).
 
 ## Punto de partida y migración
 

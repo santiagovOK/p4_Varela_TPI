@@ -1,6 +1,6 @@
 /**
  * Modal controlado con TanStack Form para actualizar stock y disponibilidad (`PATCH /productos/{id}/stock`).
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Historia `HU-TPI-04` y endpoint `PATCH /api/v1/productos/{id}/stock` (págs. 13–14).
  */
 import { useForm } from '@tanstack/react-form'

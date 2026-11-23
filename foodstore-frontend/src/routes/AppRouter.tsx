@@ -1,6 +1,6 @@
 /**
  * Enrutador principal de la aplicación con rutas públicas, protegidas y administrativas.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Sección "Estructura de carpetas del frontend — routes/AppRouter.tsx" (pág. 19)
  *   y tabla "Rutas y pantallas" (págs. 19–20).
  */

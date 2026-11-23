@@ -1,6 +1,6 @@
 """Schemas SQLModel (DTOs) para el módulo de Autenticación.
 
-Consigna TPI (docs/consignas_tpi.md):
+Consigna TPI (docs/consignas_tpi.pdf):
 - POST /api/v1/auth/register: entrada UserCreate y salida UserPublic (7 campos).
 - POST /api/v1/auth/token: respuesta 200 {"message": "Login exitoso"} (sin exponer JWT).
 - POST /api/v1/auth/logout: respuesta 200 cerrando sesión.

@@ -1,6 +1,6 @@
 /**
  * Barrel público de la feature `auth`.
- * Trazabilidad (`docs/consignas_tpi.md`): sección "Arquitectura por features" (págs. 17–18).
+ * Trazabilidad (`docs/consignas_tpi.pdf`): sección "Arquitectura por features" (págs. 17–18).
  */
 export { authApi } from './api/authApi'
 export { AuthProvider, type AuthProviderProps } from './components/AuthProvider'

@@ -1,6 +1,6 @@
 """Modelo de dominio SQLModel para Productos del catálogo.
 
-Consigna TPI (docs/consignas_tpi.md):
+Consigna TPI (docs/consignas_tpi.pdf):
 - Modelo de dominio Producto: tabla `productos` con `id`, `categoria_id` (FK a
   `categorias.id`), `nombre`, `descripcion`, `precio_base` (>= 0), `imagen_url`,
   `stock` (entero >= 0), `disponible` y `activo`.
@@ -37,9 +37,9 @@ class Producto(SQLModel, table=True):
     disponible: bool = Field(default=True, nullable=False)
     activo: bool = Field(default=True, nullable=False)
 
-    # Relación N:1 con Categoria (docs/consignas_tpi.md: Modelos y relaciones 1:N).
+    # Relación N:1 con Categoria (docs/consignas_tpi.pdf: Modelos y relaciones 1:N).
     categoria: Optional["Categoria"] = Relationship(back_populates="productos")
-    # Relación 1:N con DetallePedido (docs/consignas_tpi.md: Producto.detalles).
+    # Relación 1:N con DetallePedido (docs/consignas_tpi.pdf: Producto.detalles).
     detalles: list["DetallePedido"] = Relationship(back_populates="producto")
 
 

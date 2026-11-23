@@ -1,6 +1,6 @@
 /**
  * Punto de entrada del frontend: monta `QueryClientProvider` y configura los interceptores HTTP.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Sección "Estructura de carpetas del frontend — main.tsx" (pág. 19): `QueryClientProvider`.
  */
 import { StrictMode } from 'react'

@@ -1,6 +1,6 @@
 """Servicio de dominio y excepciones para el módulo de Autenticación.
 
-Consigna TPI (docs/consignas_tpi.md):
+Consigna TPI (docs/consignas_tpi.pdf):
 - Registro público (role="user", disabled=False, bcrypt) con rechazo 409 (UsuarioDuplicado).
 - Autenticación contra BD (401 si credenciales inválidas, 400 si cuenta desactivada).
 - Consulta autoritativa en BD por username para validar sesión activa.

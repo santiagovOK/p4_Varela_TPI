@@ -1,6 +1,6 @@
 /**
  * Constantes de mensajes y validadores puros con `.trim()` para formularios de autenticación.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Sección "Schemas" (`UserCreate`, págs. 14 y 19): `username` (1–50), `full_name` (1–150),
  *   `email` válido y `password` (8–72 caracteres y <= 72 bytes UTF-8 para bcrypt).
  */

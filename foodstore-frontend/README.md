@@ -1,6 +1,6 @@
 # Food Store — Frontend
 
-Cliente web de Food Store TPI, desarrollado con React 19, TypeScript estricto, Tailwind CSS 4 y Vite. Para la normativa y el plan de evolución TPI, consulte la [consigna](../docs/consignas_tpi.md) y la [resolución TPI](../docs/resolucion_tpi.md).
+Cliente web de Food Store TPI, desarrollado con React 19, TypeScript estricto, Tailwind CSS 4 y Vite. Para la normativa y el plan de evolución TPI, consulte la [consigna](../docs/consignas_tpi.pdf) y la [resolución TPI](../docs/resolucion_tpi.md).
 
 ## Punto de partida y migración
 

@@ -1,6 +1,6 @@
 """Schemas SQLModel (DTOs) para el módulo de Usuarios.
 
-Consigna TPI (docs/consignas_tpi.md):
+Consigna TPI (docs/consignas_tpi.pdf):
 - Schemas Usuario: `UserCreate` (registro con contraseña entre 8 y 72 caracteres/bytes
   para compatibilidad bcrypt) y `UserPublic` unificado de 7 campos (sin exponer
   `hashed_password` ni esquema dual `UserAdminPublic`).

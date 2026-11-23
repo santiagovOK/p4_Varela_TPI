@@ -1,6 +1,6 @@
 /**
  * Constantes de mensajes y validadores puros con `.trim()` para formularios de categorías.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Sección "Schemas — CategoriaCreate / CategoriaUpdate" (pág. 14) y `HU-TPI-04`.
  */
 

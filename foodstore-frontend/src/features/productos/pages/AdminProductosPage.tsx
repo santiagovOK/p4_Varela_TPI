@@ -1,6 +1,6 @@
 /**
  * Página administrativa `/admin/productos` con TanStack Table, paginación local, filtros y modales ABM/Stock (`HU-TPI-04`).
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Ruta `/admin/productos`, sección "Tablas" (`@tanstack/react-table`) y "Estado, datos y sesión" (págs. 18–20).
  */
 import {

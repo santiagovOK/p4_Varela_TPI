@@ -1,6 +1,6 @@
 /**
  * Insignia visual y textual para los cuatro estados normativos de un pedido.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Tabla "Componentes compartidos — shared/ui/" (pág. 18): `BadgeEstado` colorea los cuatro estados.
  * - Máquina de estados `RN-02` (pág. 5): `PENDIENTE`, `EN_PREPARACION`, `ENTREGADO`, `CANCELADO`.
  */

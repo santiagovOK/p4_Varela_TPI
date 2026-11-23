@@ -1,6 +1,6 @@
 """Schemas SQLModel (DTOs) para el módulo de Categorías.
 
-Consigna TPI (docs/consignas_tpi.md):
+Consigna TPI (docs/consignas_tpi.pdf):
 - Schemas de Categoria: `CategoriaCreate`, `CategoriaUpdate` (actualización parcial
   PUT con todos los campos opcionales `| None = None`) y `CategoriaRead`.
 - Criterio 2: Modelo de datos.

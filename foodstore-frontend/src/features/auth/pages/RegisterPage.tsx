@@ -1,6 +1,6 @@
 /**
  * Página de registro de usuario cliente con `@tanstack/react-form` y mutación vía `useAuth`.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Tablas "Auth y usuarios" (`POST /auth/register`), "Schemas" (`UserCreate`) y "Rutas y pantallas"
  *   (`/register`, págs. 11, 14, 18 y 19).
  */

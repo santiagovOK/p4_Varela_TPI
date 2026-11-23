@@ -1,6 +1,6 @@
 /**
  * Contratos de tipos para pedidos alineados con los schemas del backend (`pedidos`).
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Sección "Arquitectura por features — Tipos" (pág. 17) y tablas "Schemas" (págs. 14–15).
  */
 /** Estados válidos de la máquina de estados de pedidos (RN-02). */

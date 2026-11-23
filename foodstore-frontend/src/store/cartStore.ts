@@ -1,6 +1,6 @@
 /**
  * Store global del carrito de compras del cliente.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Sección "Estado, datos y sesión — cartStore" (págs. 18 y 20): Zustand + `persist` con
  *   `items`, `agregar`, `quitar`, `cambiarCantidad`, `vaciar` y `total`.
  * - Regla `RN-01` (pág. 5): consolida cantidades por `producto_id` sin duplicar líneas.

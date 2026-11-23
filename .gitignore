@@ -69,6 +69,7 @@ guidelines/
 templates/
 presentation/
 .githooks/
+docs/consignas_tpi.md
 
 
 # Alembic (si usás migraciones, NO ignores alembic/ ni versions/)

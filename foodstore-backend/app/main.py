@@ -1,6 +1,6 @@
 """Punto de entrada principal de la aplicación FastAPI Food Store.
 
-Consigna TPI (docs/consignas_tpi.md):
+Consigna TPI (docs/consignas_tpi.pdf):
 - app/main.py: crea la aplicación FastAPI, registra CORSMiddleware con
   allow_credentials=True y allow_origins=[settings.FRONTEND_ORIGIN] (nunca '*'),
   ejecuta create_all_tables() en lifespan y expone /docs y /redoc.

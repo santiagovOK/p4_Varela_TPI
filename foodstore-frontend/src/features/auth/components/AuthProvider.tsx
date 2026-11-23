@@ -1,6 +1,6 @@
 /**
  * Proveedor raíz encargado de verificar la sesión vigente al montar la aplicación.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Sección "Separación del estado" (pág. 17) y "Estructura de carpetas del frontend — App.tsx"
  *   (pág. 19): único `useEffect` que invoca `checkSession` al montar la aplicación.
  */

@@ -1,6 +1,6 @@
 /**
  * Página protegida de confirmación de pedido (`/checkout`) con `@tanstack/react-form`.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Reglas `RN-01`, `RN-05`, `RN-06`, `HU-TPI-03` y tablas de rutas/formularios (págs. 5, 13–14, 18–20).
  */
 import { useId } from 'react'

@@ -1,6 +1,6 @@
 """Abstracción base de Unit of Work para coordinación transaccional.
 
-Consigna TPI (docs/consignas_tpi.md):
+Consigna TPI (docs/consignas_tpi.pdf):
 - Unit of Work y Repository: gestión centralizada de transacciones mediante
   context manager (``with self.uow as uow:``).
 - Regla del Unit of Work: la sesión se abre con ``expire_on_commit=False`` en

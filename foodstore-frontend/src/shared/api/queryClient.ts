@@ -1,6 +1,6 @@
 /**
  * Instancia compartida de TanStack Query para la caché y sincronización del estado del servidor.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Sección "Separación del estado" y tabla "Componentes compartidos — shared/api/queryClient.ts"
  *   (págs. 17–18).
  */

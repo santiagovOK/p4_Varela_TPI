@@ -1,6 +1,6 @@
 /**
  * Constantes de mensajes y validadores puros con `.trim()` para el formulario de checkout.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Regla `RN-06` y schema `PedidoCreate` (págs. 5, 14 y 19).
  */
 import type { FormaPago } from '../types/pedido.types'
@@ -14,7 +14,7 @@ export interface CheckoutFormValues {
 export const DIRECCION_MIN_LENGTH = 5
 export const DIRECCION_MAX_LENGTH = 200
 /**
- * Validación defensiva en frontend: docs/consignas_tpi.md no fija una longitud máxima explícita
+ * Validación defensiva en frontend: docs/consignas_tpi.pdf no fija una longitud máxima explícita
  * para notas (campo opcional en DTO), pero se implementa para acotar el input del formulario.
  */
 export const NOTAS_MAX_LENGTH = 500

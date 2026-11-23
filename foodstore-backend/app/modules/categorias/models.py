@@ -1,6 +1,6 @@
 """Modelo de dominio SQLModel para Categorías del catálogo.
 
-Consigna TPI (docs/consignas_tpi.md):
+Consigna TPI (docs/consignas_tpi.pdf):
 - Modelo de dominio Categoria: tabla `categorias` con `id`, `nombre` único
   (min_length=2, max_length=100, indexado), `descripcion` opcional y `activo`.
 - Modelos y relaciones 1:N: relación `productos` (`back_populates="categoria"`).
@@ -31,7 +31,7 @@ class Categoria(SQLModel, table=True):
     descripcion: str | None = Field(default=None, nullable=True)
     activo: bool = Field(default=True, nullable=False)
 
-    # Relación 1:N con Producto (docs/consignas_tpi.md: Modelos y relaciones 1:N).
+    # Relación 1:N con Producto (docs/consignas_tpi.pdf: Modelos y relaciones 1:N).
     productos: list["Producto"] = Relationship(back_populates="categoria")
 
 

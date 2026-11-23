@@ -1,6 +1,6 @@
 """Validación única de la configuración de la aplicación.
 
-Consigna TPI (docs/consignas_tpi.md):
+Consigna TPI (docs/consignas_tpi.pdf):
 - Componentes del núcleo (app/core/config.py): Settings con pydantic-settings.
 - Variables de entorno (.env) y CE-03: DATABASE_URL, SECRET_KEY, ALGORITHM,
   ACCESS_TOKEN_EXPIRE_MINUTES y FRONTEND_ORIGIN.

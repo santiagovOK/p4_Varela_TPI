@@ -1,6 +1,6 @@
 /**
  * Contratos de tipos para categorías alineados con los schemas del backend (`categorias`).
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Sección "Arquitectura por features — Tipos" (pág. 17) y tabla "Schemas" (pág. 14).
  */
 /** DTO de salida pública para una categoría. */

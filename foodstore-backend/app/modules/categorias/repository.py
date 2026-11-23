@@ -1,6 +1,6 @@
 """Repositorio de acceso a datos para el módulo de Categorías.
 
-Consigna TPI (docs/consignas_tpi.md):
+Consigna TPI (docs/consignas_tpi.pdf):
 - Arquitectura en capas: Routers -> Services -> Unit of Work -> Repositories -> Models.
 - Regla del Unit of Work: los repositorios encapsulan consultas y persistencia sobre
   una ``Session`` compartida (``add``, ``flush``, ``refresh``, ``delete``) sin invocar
@@ -29,7 +29,7 @@ class CategoriaRepository(BaseRepository[Categoria]):
         """Busca una categoría por nombre exacto incluyendo inactivas.
 
         La baja lógica (``activo=False``) conserva la restricción ``unique`` sobre
-        ``categorias.nombre`` (docs/consignas_tpi.md: API REST Categorías).
+        ``categorias.nombre`` (docs/consignas_tpi.pdf: API REST Categorías).
         """
         statement = select(Categoria).where(Categoria.nombre == nombre)
         return self.session.exec(statement).first()

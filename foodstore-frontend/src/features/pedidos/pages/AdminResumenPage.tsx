@@ -1,6 +1,6 @@
 /**
  * Página administrativa `/admin/resumen` con tarjetas de indicadores de pedidos.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Historia `HU-TPI-05`, ruta `/admin/resumen` y tabla "Rutas y pantallas" (págs. 14, 18–20).
  */
 import { formatPrecio } from '@/features/productos'

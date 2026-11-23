@@ -1,6 +1,6 @@
 /**
  * Indicador de carga inicial accesible mediante bloques skeleton con respeto a `prefers-reduced-motion`.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Tabla "Componentes compartidos — shared/components/" (págs. 18–19): `Skeleton`.
  */
 export type SkeletonVariant = 'card' | 'row' | 'text'

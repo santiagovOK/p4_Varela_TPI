@@ -1,6 +1,6 @@
 /**
  * Normalización de errores HTTP de FastAPI hacia mensajes legibles para la interfaz.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Sección "API REST — Errores" (`HTTPException` con `detail` string o lista `422`, págs. 10–11).
  * - Tabla "Componentes compartidos — shared/api/handleApiError.ts" (pág. 18).
  */

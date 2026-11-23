@@ -1,6 +1,6 @@
 /**
  * Control de paginación accesible reutilizable en catálogos y listados paginados.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Tabla "Componentes compartidos — shared/components/" (pág. 18): `Paginacion`.
  * - Convenciones API REST (`skip`, `limit`, `total`, pág. 10) y rutas `/` y `/mis-pedidos` (págs. 19–20).
  */

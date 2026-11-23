@@ -1,6 +1,6 @@
 """Repositorio de acceso a datos para el módulo de Usuarios.
 
-Consigna TPI (docs/consignas_tpi.md):
+Consigna TPI (docs/consignas_tpi.pdf):
 - Arquitectura en capas: Routers -> Services -> Unit of Work -> Repositories -> Models.
 - Regla del Unit of Work: los repositorios solo usan add, flush, refresh y delete;
   nunca llaman a session.commit(), delegando la transacción al UnitOfWork.

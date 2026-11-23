@@ -1,6 +1,6 @@
 """Router FastAPI para los endpoints de Autenticación (`/api/v1/auth/*`).
 
-Consigna TPI (docs/consignas_tpi.md):
+Consigna TPI (docs/consignas_tpi.pdf):
 - POST /api/v1/auth/register -> 201 UserPublic (7 campos) / 409 UsuarioDuplicado.
 - POST /api/v1/auth/token -> 200 {"message": "Login exitoso"} + cookie HttpOnly `access_token`.
 - POST /api/v1/auth/logout -> 200 eliminando cookie `access_token`.

@@ -1,6 +1,6 @@
 /**
  * Componente de estado de error con variante de alerta principal y variante no destructiva para refetch.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Tabla "Componentes compartidos — shared/components/" (pág. 18): `EstadoError`.
  */
 import { Button } from '@/shared/ui'

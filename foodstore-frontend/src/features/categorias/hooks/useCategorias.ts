@@ -1,6 +1,6 @@
 /**
  * Hook TanStack Query para consultar las categorías del catálogo.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Sección "Arquitectura por features — hooks/" y "Estado, datos y sesión" (págs. 17–18).
  */
 import { useQuery } from '@tanstack/react-query'

@@ -1,6 +1,6 @@
 """Unit of Work para el módulo de Usuarios.
 
-Consigna TPI (docs/consignas_tpi.md):
+Consigna TPI (docs/consignas_tpi.pdf):
 - Arquitectura en capas: Routers -> Services -> Unit of Work -> Repositories -> Models.
 - Regla del Unit of Work: ``UsuarioUnitOfWork`` hereda de ``UnitOfWork`` (sesión
   con ``expire_on_commit=False``, commit/rollback y close automático en ``__exit__``)

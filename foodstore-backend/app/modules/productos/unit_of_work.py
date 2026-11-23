@@ -1,6 +1,6 @@
 """Unit of Work para el módulo de Productos.
 
-Consigna TPI (docs/consignas_tpi.md):
+Consigna TPI (docs/consignas_tpi.pdf):
 - Arquitectura en capas: Routers -> Services -> Unit of Work -> Repositories -> Models.
 - Regla del Unit of Work: ``ProductoUnitOfWork`` administra una única ``Session``
   con ``expire_on_commit=False`` compartida entre ``ProductoRepository`` y

@@ -1,6 +1,6 @@
 /**
  * Cliente HTTP de categorías para catálogo público y administración ABM.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Sección "API REST — Categorías" (pág. 12) y "Arquitectura por features — api/" (págs. 17–18).
  */
 import { axiosInstance } from '@/shared/api/axiosInstance'

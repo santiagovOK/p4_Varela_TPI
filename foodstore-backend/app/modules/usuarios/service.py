@@ -1,6 +1,6 @@
 """Servicio de lógica de negocio y excepciones para el módulo de Usuarios.
 
-Consigna TPI (docs/consignas_tpi.md):
+Consigna TPI (docs/consignas_tpi.pdf):
 - Listado completo de usuarios para administración (incluyendo cuentas desactivadas)
   retornando ``UserPublic`` de 7 campos validado dentro del bloque ``with self.uow as uow:``.
 - Activación y desactivación idempotentes (``disabled=False`` / ``disabled=True``).

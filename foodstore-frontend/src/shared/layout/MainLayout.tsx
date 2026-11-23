@@ -1,6 +1,6 @@
 /**
  * Estructura de diseño principal que envuelve las rutas con la barra de navegación y `<Outlet />`.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Tabla "Componentes compartidos — shared/layout/" (pág. 18): `MainLayout`.
  */
 import { Outlet } from 'react-router-dom'

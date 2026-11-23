@@ -1,6 +1,6 @@
 /**
  * Primitiva visual de botón reutilizable con variantes, tamaños y estado de carga accesible.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Tabla "Componentes compartidos — shared/ui/" (pág. 18): `Button`.
  */
 import type { ButtonHTMLAttributes } from 'react'

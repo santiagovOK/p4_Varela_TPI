@@ -1,6 +1,6 @@
 /**
  * Constantes de mensajes y validadores puros con `.trim()` para formularios de productos y stock.
- * Trazabilidad (`docs/consignas_tpi.md`):
+ * Trazabilidad (`docs/consignas_tpi.pdf`):
  * - Sección "Schemas — ProductoCreate / ProductoUpdate / ProductoStockUpdate" (pág. 14) y `HU-TPI-04`.
  */
 
