@@ -2,10 +2,9 @@
 # ==============================================================================
 # setup.sh — Aprovisionamiento de entorno para Food Store TPI
 # ==============================================================================
-# Aprovisiona herramientas y entornos para la base heredada de catálogo
+# Aprovisiona herramientas y entornos para el sistema Food Store TPI
 # (Python / FastAPI + Node.js / React / TypeScript / Vite / Tailwind y Orquestador).
-# No implementa las funcionalidades pendientes del TPI; puede modificar entornos,
-# archivos .env y la base de datos según las opciones seleccionadas.
+# Puede modificar entornos, archivos .env y la base de datos según las opciones seleccionadas.
 # ==============================================================================
 
 set -Eeuo pipefail
@@ -14,9 +13,9 @@ IFS=$'\n\t'
 # ==============================================================================
 # IDENTIDAD Y CONFIGURACIÓN DEL PROYECTO
 # ==============================================================================
-# Este script auto-detecta la estructura existente de Food Store TPI (base
-# heredada de catálogo). Si los nombres de carpetas difieren, puede configurarlos
-# de cualquiera de estas tres formas (primera que defina gana):
+# Este script auto-detecta la estructura existente de Food Store TPI.
+# Si los nombres de carpetas difieren, puede configurarlos de cualquiera de estas
+# tres formas (primera que defina gana):
 #
 #   1. Modificando los valores por defecto en este bloque de configuración.
 #   2. Exportando variables de entorno antes de ejecutar:
@@ -43,7 +42,7 @@ CONFIG_FRONTEND_DIR="${FRONTEND_DIR:-}"
 FASTAPI_APP_MODULE="${FASTAPI_APP_MODULE:-}"
 
 # 5. Módulos Python esenciales cuya importación se valida tras la instalación:
-CORE_PY_MODULES="${CORE_PY_MODULES:-"fastapi uvicorn sqlmodel sqlalchemy psycopg2 pydantic dotenv pytest httpx"}"
+CORE_PY_MODULES="${CORE_PY_MODULES:-"fastapi uvicorn sqlmodel sqlalchemy psycopg2 pydantic pydantic_settings dotenv jose passlib bcrypt multipart pytest httpx"}"
 
 # 6. Nombre por defecto de la base de datos PostgreSQL:
 # Si se deja vacío (""), se extrae automáticamente de .env.example o del nombre del proyecto.
@@ -196,11 +195,11 @@ print_help() {
     cat <<EOF
 Uso: $(basename "$0") [OPCIONES]
 
-Script de aprovisionamiento de herramientas y entornos para Food Store TPI
-(base heredada de catálogo; no implementa las funcionalidades pendientes del TPI).
+Script de aprovisionamiento de herramientas y entornos para Food Store TPI.
 
-Puede instalar herramientas, modificar archivos .env y crear tablas o semillar
-unidades de medida según la configuración. No es una consulta de solo lectura.
+Puede instalar herramientas, modificar archivos .env, crear tablas en la base
+de datos y ejecutar el seed inicial (python -m app.db.seed) según la configuración.
+No es una consulta de solo lectura.
 
 CONFIGURACIÓN DETECTADA:
   Proyecto     : ${PROJECT_TITLE}
@@ -229,7 +228,7 @@ OPCIONES DE PERSONALIZACIÓN DE CARPETAS / PROYECTO:
   -h, --help                     Muestra este mensaje de ayuda y finaliza.
 
 EJEMPLOS:
-  ./setup.sh                                     # Aprovisionamiento auto-detectado de la base heredada
+  ./setup.sh                                     # Aprovisionamiento auto-detectado del sistema TPI
   ./setup.sh --yes                               # Aprovisionamiento desatendido para CI o scripts
   ./setup.sh --db-mode sqlite                    # Fuerza el uso directo de SQLite en disco
   ./setup.sh --backend-dir api --frontend-dir ui # Personaliza rutas para proyectos no estándar
@@ -632,18 +631,31 @@ for m in mods:
 print(f'  {len(mods)} módulos esenciales importados correctamente.')
 "
 
-# Verificación de importación limpia del módulo de aplicación en memoria (si existe)
+# Verificación de importación limpia del módulo de aplicación y paquetes TPI en memoria
 if [[ -n "$FASTAPI_APP_MODULE" ]]; then
     (
         cd "${BACKEND_DIR}" && \
-        DATABASE_URL="sqlite:///:memory:" "$VENV_PYTHON" -c "
+        DATABASE_URL="sqlite:///:memory:" \
+        SECRET_KEY="${SECRET_KEY:-setup-smoke-check-secret-key-at-least-32-chars}" \
+        "$VENV_PYTHON" -c "
 import importlib, sys
-try:
-    importlib.import_module('${FASTAPI_APP_MODULE}')
-    print('  FastAPI ${FASTAPI_APP_MODULE} cargado satisfactoriamente.')
-except Exception as e:
-    print(f'Aviso: no se pudo cargar ${FASTAPI_APP_MODULE}: {e}', file=sys.stderr)
-" || true
+tpi_modules = [
+    '${FASTAPI_APP_MODULE}',
+    'app.db.seed',
+    'app.modules.auth',
+    'app.modules.usuarios',
+    'app.modules.categorias',
+    'app.modules.productos',
+    'app.modules.pedidos',
+]
+for mod in tpi_modules:
+    try:
+        importlib.import_module(mod)
+    except Exception as e:
+        print(f'Error al importar módulo TPI {mod}: {e}', file=sys.stderr)
+        sys.exit(1)
+print(f'  {len(tpi_modules)} módulos TPI (${FASTAPI_APP_MODULE}, seed y 5 módulos de dominio) cargados satisfactoriamente.')
+"
     )
 fi
 log_success "Paquetes Python y entorno backend validados."
@@ -718,7 +730,7 @@ if [[ -f "$ENV_FILE" ]]; then
 
     apply_db_mode "$DB_MODE"
 
-    # Probar la conectividad real, DDL de tablas y semillado de la URL configurada
+    # Probar la conectividad real, DDL de las 5 tablas TPI y semillado de la URL configurada
     test_db_connection() {
         (
             cd "${BACKEND_DIR}" && \
@@ -732,19 +744,19 @@ url = os.getenv('DATABASE_URL', '').strip()
 if not url:
     sys.exit(2)
 
-import importlib
 import app.core.database as db
-from sqlalchemy import text
+from sqlalchemy import inspect as sa_inspect, text
 
 with db.engine.connect() as conn:
     conn.execute(text('SELECT 1'))
 
-db.create_db_and_tables()
-if importlib.util.find_spec('app.db.seed') is not None:
-    seed_mod = importlib.import_module('app.db.seed')
-    if hasattr(seed_mod, 'seed'):
-        seed_mod.seed()
-" 2>/dev/null
+db.create_all_tables()
+tables = set(sa_inspect(db.engine).get_table_names())
+expected = {'usuarios', 'categorias', 'productos', 'pedidos', 'detalle_pedidos'}
+if not expected.issubset(tables):
+    sys.exit(3)
+" 2>/dev/null && \
+            "$VENV_PYTHON" -m app.db.seed >/dev/null 2>&1
         )
     }
 
@@ -774,9 +786,9 @@ else
 fi
 
 # ------------------------------------------------------------------------------
-# 6. Motor Node.js (>= 18.18), Gestor pnpm y Paquetes Frontend/Raíz (.ts / .tsx)
+# 6. Motor Node.js (>= 20.19), Gestor pnpm (>= 9) y Paquetes Frontend/Raíz (.ts / .tsx)
 # ------------------------------------------------------------------------------
-log_step "5/6. Verificando motor Node.js (>= 18.18), pnpm y dependencias Frontend/Raíz..."
+log_step "5/6. Verificando motor Node.js (>= 20.19), pnpm (>= 9) y dependencias Frontend/Raíz..."
 
 hydrate_node_env() {
     # NVM
@@ -812,14 +824,14 @@ hydrate_node_env
 
 check_node_version() {
     if command -v node >/dev/null 2>&1; then
-        node -e "const [M,m]=process.versions.node.split('.').map(Number); process.exit((M>18||(M===18&&m>=18))?0:1)" 2>/dev/null
+        node -e "const [M,m]=process.versions.node.split('.').map(Number); process.exit((M>20||(M===20&&m>=19))?0:1)" 2>/dev/null
         return $?
     fi
     return 1
 }
 
 if ! check_node_version; then
-    log_warn "Node.js no está instalado o su versión es menor a 18.18. Intentando provisión..."
+    log_warn "Node.js no está instalado o su versión es menor a 20.19. Intentando provisión..."
     if command -v nvm >/dev/null 2>&1; then
         log_info "Instalando Node LTS vía nvm..."
         nvm install --lts && nvm use --lts
@@ -850,8 +862,8 @@ if ! check_node_version; then
 fi
 
 if ! check_node_version; then
-    log_error "No se pudo proveer un motor Node.js >= 18.18."
-    log_error "Por favor instale Node.js 18.18+, 20 LTS o 22 LTS (recomendado: fnm o nvm) y reintente."
+    log_error "No se pudo proveer un motor Node.js >= 20.19."
+    log_error "Por favor instale Node.js 20.19+ o 22 LTS (recomendado: fnm o nvm) y reintente."
     exit 1
 fi
 
@@ -862,7 +874,7 @@ check_pnpm() {
     if command -v pnpm >/dev/null 2>&1; then
         local pnpm_maj
         pnpm_maj="$(pnpm -v | cut -d. -f1)"
-        if [[ "$pnpm_maj" -ge 8 ]]; then
+        if [[ "$pnpm_maj" -ge 9 ]]; then
             return 0
         fi
     fi
@@ -870,7 +882,7 @@ check_pnpm() {
 }
 
 if ! check_pnpm; then
-    log_warn "pnpm (>= 8) no disponible en PATH. Iniciando provisión en espacio de usuario..."
+    log_warn "pnpm (>= 9) no disponible en PATH. Iniciando provisión en espacio de usuario..."
     mkdir -p "${HOME}/.local/bin" "${HOME}/.local/share/pnpm"
     
     # Intento 1: Corepack
@@ -1005,6 +1017,17 @@ else
             )
         fi
         log_success "Compilación de frontend completada sin errores (artefactos dist/ eliminados)."
+
+        if [[ -d "${FRONTEND_DIR}/src" ]] && find "${FRONTEND_DIR}/src" -type f \( -name "*.test.ts" -o -name "*.test.tsx" -o -name "*.spec.ts" -o -name "*.spec.tsx" \) -print -quit | grep -q .; then
+            if grep -q '"test"' "${FRONTEND_DIR}/package.json" 2>/dev/null; then
+                log_info "Ejecutando suite de pruebas frontend (vitest) en ${FRONTEND_REL_DIR}..."
+                (
+                    cd "${FRONTEND_DIR}" && \
+                    pnpm run test
+                )
+                log_success "Pruebas frontend superadas al 100%."
+            fi
+        fi
     fi
 fi
 
@@ -1024,7 +1047,7 @@ VITE_VERSION="N/A"
 
 echo ""
 echo -e "${C_BOLD}${C_GREEN}==============================================================================${C_RESET}"
-echo -e "${C_BOLD}${C_GREEN}  ¡Aprovisionamiento de la base heredada completado!                       ${C_RESET}"
+echo -e "${C_BOLD}${C_GREEN}  ¡Aprovisionamiento del sistema Food Store TPI completado!                  ${C_RESET}"
 echo -e "${C_BOLD}${C_GREEN}  Proyecto: ${PROJECT_TITLE}                                                  ${C_RESET}"
 echo -e "${C_BOLD}${C_GREEN}==============================================================================${C_RESET}"
 echo -e "  ${C_BOLD}Directorio Raíz :${C_RESET} ${ROOT_DIR}"

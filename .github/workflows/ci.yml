@@ -94,13 +94,17 @@ jobs:
               print("[OK] Conexión a PostgreSQL 16 verificada. Aún no hay código Python en app/.")
               sys.exit(0)
 
-          # Si existen paquetes en app/, verificar importabilidad de los archivos detectados
+          # Si existen paquetes en app/, verificar importabilidad de los módulos del sistema TPI
           expected_packages = [
               "app",
               "app.core",
+              "app.db",
               "app.modules",
+              "app.modules.auth",
+              "app.modules.usuarios",
               "app.modules.categorias",
               "app.modules.productos",
+              "app.modules.pedidos",
           ]
           for pkg in expected_packages:
               try:
@@ -158,6 +162,17 @@ jobs:
           inspector = sa_inspect(app_engine)
           tables = inspector.get_table_names()
           print(f"[INFO] Tablas creadas en PostgreSQL: {tables}")
+
+          expected_tables = {"usuarios", "categorias", "productos", "pedidos", "detalle_pedidos"}
+          legacy_tables = {"unidades_medida", "producto_categorias", "ingredientes"}
+          missing_tables = expected_tables - set(tables)
+          if missing_tables:
+              print(f"ERROR: Faltan tablas obligatorias del TPI en PostgreSQL: {sorted(missing_tables)}", file=sys.stderr)
+              sys.exit(1)
+          found_legacy = legacy_tables & set(tables)
+          if found_legacy:
+              print(f"ERROR: Se detectaron tablas heredadas obsoletas del parcial: {sorted(found_legacy)}", file=sys.stderr)
+              sys.exit(1)
 
           for t in tables:
               pk_cols = inspector.get_pk_constraint(t).get("constrained_columns", [])
@@ -244,7 +259,7 @@ jobs:
             echo "[INFO] index.html detectado. Ejecutando pnpm run build..."
             pnpm run build
           else
-            echo "[INFO] index.html no detectado. Se omite el build Vite en esta base heredada."
+            echo "[INFO] index.html no detectado. Se omite el build Vite."
           fi
 
       - name: Ejecución de pruebas Vitest (adaptativo)
