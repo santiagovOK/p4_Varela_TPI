@@ -38,18 +38,22 @@ class PedidoRepository(BaseRepository[Pedido]):
         """Inicializa el repositorio de pedidos con la sesión compartida."""
         super().__init__(session, Pedido)
 
-    def get_by_id(self, entity_id: Any) -> Pedido | None:
+    def get_by_id(self, entity_id: Any, *, for_update: bool = False) -> Pedido | None:
         """Obtiene un pedido por su ``id`` cargando anticipadamente sus ``items``."""
         statement = (
             select(Pedido)
             .where(Pedido.id == entity_id)
             .options(selectinload(Pedido.items))  # type: ignore[arg-type]
         )
+        if for_update:
+            statement = statement.with_for_update()
         return self.session.exec(statement).first()
 
-    def get_by_id_with_items(self, pedido_id: int) -> Pedido | None:
+    def get_by_id_with_items(
+        self, pedido_id: int, *, for_update: bool = False
+    ) -> Pedido | None:
         """Alias explícito para obtener un pedido por ``id`` con ``items`` precargados."""
-        return self.get_by_id(pedido_id)
+        return self.get_by_id(pedido_id, for_update=for_update)
 
     def add_detalle(self, detalle: DetallePedido) -> DetallePedido:
         """Agrega una línea ``DetallePedido`` a la sesión y sincroniza con ``flush``.

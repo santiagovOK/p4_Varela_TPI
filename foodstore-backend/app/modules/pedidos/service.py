@@ -87,7 +87,7 @@ def _normalizar_notas(notas: str | None) -> str | None:
 def _restituir_stock(uow: PedidoUnitOfWork, pedido: Pedido) -> None:
     """Restituye el stock de cada línea del pedido dentro de la transacción activa (RN-03)."""
     for item in pedido.items:
-        producto = uow.productos.get_by_id(item.producto_id)
+        producto = uow.productos.get_by_id(item.producto_id, for_update=True)
         if producto is not None:
             producto.stock += item.cantidad
             uow.productos.update(producto)
@@ -133,7 +133,9 @@ class PedidoService:
 
             total = 0.0
             for item in data.items:
-                producto = uow.productos.get_activo_by_id(item.producto_id)
+                producto = uow.productos.get_activo_by_id(
+                    item.producto_id, for_update=True
+                )
                 if producto is None:
                     raise ProductoNoEncontrado(
                         f"Producto con id {item.producto_id} no encontrado."
@@ -184,7 +186,7 @@ class PedidoService:
         nuevo_estado = data.estado if isinstance(data, CambioEstado) else str(data)
 
         with self.uow as uow:
-            pedido = uow.pedidos.get_by_id_with_items(pedido_id)
+            pedido = uow.pedidos.get_by_id_with_items(pedido_id, for_update=True)
             if pedido is None:
                 raise PedidoNoEncontrado(
                     f"Pedido con id {pedido_id} no encontrado."
@@ -270,7 +272,7 @@ class PedidoService:
     ) -> PedidoRead:
         """Cancela un pedido propio en estado ``PENDIENTE`` restituyendo stock (RN-03, RN-04)."""
         with self.uow as uow:
-            pedido = uow.pedidos.get_by_id_with_items(pedido_id)
+            pedido = uow.pedidos.get_by_id_with_items(pedido_id, for_update=True)
             if pedido is None:
                 raise PedidoNoEncontrado(
                     f"Pedido con id {pedido_id} no encontrado."

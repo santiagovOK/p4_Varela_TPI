@@ -8,6 +8,11 @@
 - Modelo objetivo: [UML Food Store](docs/tpi_UML_Food_Store.svg).
 - Plan y trazabilidad: [resolucion_tpi.md](docs/resolucion_tpi.md).
 
+## Video explicativo
+
+**Link Principal**: https://www.youtube.com/watch?v=hduuk1okaTI
+**Link Opción B**: https://drive.google.com/file/d/1DE2IddkjzipM4nxfFn5FSNj3x1cydQMR/view?usp=sharing 
+
 ## Punto de partida y alcance TPI
 
 Este repositorio parte de **la base heredada de los TPs de Unidad 9 y Unidad 10** tras la limpieza de los artefactos exclusivos del segundo parcial (unidades de medida, relación N:N `ProductoCategoria`, `stock_cantidad`, `hay_stock`, `anulado_at`). La [resolución](docs/resolucion_tpi.md) detalla qué se hereda de TP9/TP10, qué se adapta/migra (catálogo público, `UnitOfWork`, `authStore` con `persist`/`partialize`, `handleApiError` con `.cause`) y qué se construye nuevo (módulo `pedidos`, `cartStore`, checkout y paneles admin).

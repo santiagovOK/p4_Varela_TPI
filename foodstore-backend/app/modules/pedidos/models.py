@@ -51,7 +51,10 @@ class Pedido(SQLModel, table=True):
 
     # Relaciones UML (docs/consignas_tpi.md: Pedido.usuario y Pedido.items).
     usuario: Optional["Usuario"] = Relationship(back_populates="pedidos")
-    items: list["DetallePedido"] = Relationship(back_populates="pedido")
+    items: list["DetallePedido"] = Relationship(
+        back_populates="pedido",
+        sa_relationship_kwargs={"cascade": "all, delete-orphan"},
+    )
 
 
 class DetallePedido(SQLModel, table=True):

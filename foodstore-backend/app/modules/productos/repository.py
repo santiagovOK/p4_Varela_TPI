@@ -30,16 +30,20 @@ class ProductoRepository(BaseRepository[Producto]):
         """Inicializa el repositorio de productos con la sesión compartida."""
         super().__init__(session, Producto)
 
-    def get_by_id(self, entity_id: Any) -> Producto | None:
+    def get_by_id(self, entity_id: Any, *, for_update: bool = False) -> Producto | None:
         """Obtiene un producto por su ``id`` cargando anticipadamente ``categoria``."""
         statement = (
             select(Producto)
             .where(Producto.id == entity_id)
             .options(selectinload(Producto.categoria))  # type: ignore[arg-type]
         )
+        if for_update:
+            statement = statement.with_for_update()
         return self.session.exec(statement).first()
 
-    def get_activo_by_id(self, producto_id: int) -> Producto | None:
+    def get_activo_by_id(
+        self, producto_id: int, *, for_update: bool = False
+    ) -> Producto | None:
         """Obtiene un producto activo por su ``id`` cargando ``categoria``."""
         statement = (
             select(Producto)
@@ -49,6 +53,8 @@ class ProductoRepository(BaseRepository[Producto]):
             )
             .options(selectinload(Producto.categoria))  # type: ignore[arg-type]
         )
+        if for_update:
+            statement = statement.with_for_update()
         return self.session.exec(statement).first()
 
     def search(
