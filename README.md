@@ -1,77 +1,140 @@
 # Trabajo Práctico Integrador — Food Store: Sistema de pedidos de comida
 
-**Materia:** Programación IV (TUPaD - UTN).
-**Estudiante:** Varela, Santiago Octavio
+**Materia:** Programación IV (TUPaD - UTN).  
+**Estudiante:** Varela, Santiago Octavio  
 **Email institucional:** santiago.varela@tupad.utn.edu.ar
 
-- Consigna normativa: [consignas_tpi.md](docs/consignas_tpi.md) ([PDF](docs/consignas_tpi.pdf)).
-- Modelo objetivo: [UML Food Store](docs/tpi_UML_Food_Store.svg).
-- Plan y trazabilidad: [resolucion_tpi.md](docs/resolucion_tpi.md).
+- **Repositorio GitHub:** https://github.com/santiagovOK/p4_Varela_TPI
+- **Consigna normativa:** [consignas_tpi.md](docs/consignas_tpi.md) ([PDF](docs/consignas_tpi.pdf))
+- **Modelo objetivo:** [UML Food Store](docs/tpi_UML_Food_Store.svg)
+- **Plan, arquitectura y trazabilidad:** [resolucion_tpi.md](docs/resolucion_tpi.md)
+- **Diagrama RBAC y seguridad:** [diagrama_rbac.mmd](docs/diagrama_rbac.mmd)
 
 ## Video explicativo
 
-**Link Principal**: https://www.youtube.com/watch?v=hduuk1okaTI
-**Link Opción B**: https://drive.google.com/file/d/1DE2IddkjzipM4nxfFn5FSNj3x1cydQMR/view?usp=sharing 
+- **Link Principal (YouTube):** https://www.youtube.com/watch?v=hduuk1okaTI
+- **Link Opción B (Google Drive):** https://drive.google.com/file/d/1DE2IddkjzipM4nxfFn5FSNj3x1cydQMR/view?usp=sharing
 
-## Punto de partida y alcance TPI
+- [Trabajo Práctico Integrador — Food Store: Sistema de pedidos de comida](#trabajo-práctico-integrador--food-store-sistema-de-pedidos-de-comida)
+  - [Video explicativo](#video-explicativo)
+  - [Descripción general del sistema](#descripción-general-del-sistema)
+  - [Requisitos del entorno](#requisitos-del-entorno)
+  - [Instalación y ejecución manual (Guía normativa autónoma)](#instalación-y-ejecución-manual-guía-normativa-autónoma)
+    - [1. Backend (`foodstore-backend/`)](#1-backend-foodstore-backend)
+    - [2. Frontend (`foodstore-frontend/`)](#2-frontend-foodstore-frontend)
+  - [Variables de entorno](#variables-de-entorno)
+    - [Backend (`foodstore-backend/.env`)](#backend-foodstore-backendenv)
+    - [Frontend (`foodstore-frontend/.env`)](#frontend-foodstore-frontendenv)
+  - [URLs principales del sistema](#urls-principales-del-sistema)
+  - [Elementos adicionales respecto al cumplimiento estricto de las consignas](#elementos-adicionales-respecto-al-cumplimiento-estricto-de-las-consignas)
 
-Este repositorio parte de **la base heredada de los TPs de Unidad 9 y Unidad 10** tras la limpieza de los artefactos exclusivos del segundo parcial (unidades de medida, relación N:N `ProductoCategoria`, `stock_cantidad`, `hay_stock`, `anulado_at`). La [resolución](docs/resolucion_tpi.md) detalla qué se hereda de TP9/TP10, qué se adapta/migra (catálogo público, `UnitOfWork`, `authStore` con `persist`/`partialize`, `handleApiError` con `.cause`) y qué se construye nuevo (módulo `pedidos`, `cartStore`, checkout y paneles admin).
+## Descripción general del sistema
 
-Directorios físicos actuales: `foodstore-backend/` y `foodstore-frontend/`. Guías de cada subproyecto: [backend](foodstore-backend/README.md) y [frontend](foodstore-frontend/README.md).
+**Food Store** es una aplicación web full-stack para la gestión de pedidos de comida, organizada en dos proyectos independientes comunicados vía API REST bajo `/api/v1`:
 
-## Requisitos recomendados para ejecutar la base heredada
+- **Backend (`foodstore-backend/`):** FastAPI + SQLModel + PostgreSQL (o SQLite en desarrollo local), con arquitectura en capas (`Routers -> Services -> UnitOfWork -> Repositories -> Models`), autenticación JWT en cookie `HttpOnly` (`access_token`), control de acceso basado en roles (`user` / `admin`) y gestión transaccional de pedidos y stock.
+- **Frontend (`foodstore-frontend/`):** React 19 + TypeScript estricto (`strict: true`) + Vite + Tailwind CSS v4, organizado por `features/` (`auth`, `categorias`, `productos`, `usuarios`, `pedidos`), estado remoto con TanStack Query v5, formularios con TanStack Form v1, tablas administrativas con TanStack Table v8 y estado global con Zustand v5.
 
-Como entorno reproducible, se recomienda **Python 3.12, PostgreSQL 16, Node.js 22 y pnpm 10** (coherentes con CI actual). Esto es una recomendación para esta base, no una garantía del script ni los mínimos normativos futuros del TPI. `setup.sh` actualmente acepta Python **≥3.11**, Node.js **≥18.18** y pnpm **≥8**; los requisitos objetivo TPI son distintos y están detallados en la [resolución](docs/resolucion_tpi.md). Las dependencias no están fijadas a las versiones normativas futuras.
+Guías específicas de cada subproyecto: [backend](foodstore-backend/README.md) y [frontend](foodstore-frontend/README.md).
 
-## Preparación y ejecución
+## Requisitos del entorno
 
-### Opción A: aprovisionamiento automatizado
+- **Python:** `>= 3.11`
+- **Node.js:** `>= 20.19`
+- **pnpm:** `>= 9`
+- **Base de datos:** PostgreSQL `>= 15` (recomendado en producción/evaluación) o SQLite local (`sqlite:///./dev.db`) para pruebas rápidas.
 
-Desde la raíz, `./setup.sh --help` muestra opciones sin aprovisionar. La ejecución normal de `./setup.sh` **no es un diagnóstico de solo lectura**: puede instalar herramientas/dependencias, crear o reutilizar `.venv` en la raíz y enlazarlo desde el backend, copiar `.env.example` a `.env`, validar/configurar conectividad de base de datos, crear tablas y ejecutar `app.db.seed` si está disponible. También puede iniciar servidores si se solicita `--start`. Revise sus efectos y opciones antes de ejecutarlo; no use opciones de instalación/BD si solo quiere consultar ayuda.
+## Instalación y ejecución manual (Guía normativa autónoma)
 
-### Opción B: preparación manual
+Los siguientes pasos permiten instalar, inicializar y ejecutar el sistema completo de forma manual y autónoma desde una máquina limpia, sin depender de `setup.sh` (el cual se conserva únicamente como utilidad auxiliar opcional).
 
-Los siguientes comandos se ejecutan desde la raíz. Requieren una instancia PostgreSQL accesible y una base `foodstore` configurada según el entorno local.
+### 1. Backend (`foodstore-backend/`)
+
+Desde la raíz del repositorio:
 
 ```bash
-# Backend: crear el entorno Python en la raíz del repositorio
+cd foodstore-backend
 python3 -m venv .venv
-.venv/bin/python -m pip install -r foodstore-backend/requirements.txt
-cp foodstore-backend/.env.example foodstore-backend/.env
-# Si corresponde, editar foodstore-backend/.env y ajustar DATABASE_URL.
-
-# Frontend: copiar configuración y preparar paquetes
-cp foodstore-frontend/.env.example foodstore-frontend/.env
-pnpm --dir foodstore-frontend install
+source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
 ```
 
-Inicie backend y frontend en terminales separadas, también desde la raíz:
+Si utiliza PostgreSQL, verifique o ajuste `DATABASE_URL` en `foodstore-backend/.env`. Para desarrollo rápido con SQLite local puede usar `DATABASE_URL=sqlite:///./dev.db`.
+
+Cargue los datos iniciales de forma idempotente (crea tablas si no existen, el usuario administrador por defecto, 4 categorías y 8 productos con stock positivo):
 
 ```bash
-(cd foodstore-backend && ../.venv/bin/python -m uvicorn app.main:app --reload --port 8000)
-pnpm --dir foodstore-frontend dev
+python -m app.db.seed
 ```
 
-La API queda en `http://localhost:8000` y la aplicación Vite en `http://localhost:5173`; documentación API: `http://localhost:8000/docs`. El frontend actual usa `VITE_API_URL=http://localhost:8000` y agrega `/api/v1` en su código. No anteponga `/api/v1` a esa variable en la configuración heredada.
+Credenciales del administrador generado por el seed:
+- **Usuario:** `admin`
+- **Contraseña:** `Admin1234!`
 
-El paquete de orquestación de la raíz puede instalarse, si se desean sus scripts, ejecutando `pnpm install` desde la raíz. Sus scripts actuales incluyen `pnpm run dev`, `pnpm run dev:back`, `pnpm run dev:front`, `pnpm run build:front`, `pnpm run test:back` y `pnpm run test:front`. El script de backend raíz espera `.venv` en la raíz.
+Inicie el servidor API en el puerto `8000`:
 
-## Pruebas e infraestructura
+```bash
+uvicorn app.main:app --reload --port 8000
+```
 
-Las carpetas de pruebas (`foodstore-backend/tests/` y `foodstore-frontend/src/__tests__/`) actúan como red de verificación interna (`pytest` + `TestClient` con `StaticPool` y `Vitest` / Testing Library) y se refinan en cada corte de contrato de la [resolución](docs/resolucion_tpi.md). Para la entrega final (`CE-01`), las carpetas de tests se excluyen explícitamente del `.zip`.
+### 2. Frontend (`foodstore-frontend/`)
 
-El hook local está en `.githooks/pre-commit`. Su ubicación en el repositorio no significa que esté instalado como hook activo en `.git/hooks`; no se afirma aquí que se haya configurado. Las exclusiones y verificaciones del hook son las existentes.
+En una nueva terminal, desde la raíz del repositorio:
 
-## Objetivo TPI pendiente
+```bash
+cd foodstore-frontend
+cp .env.example .env
+pnpm install
+pnpm build
+pnpm dev
+```
 
-El objetivo normativo es el sistema de pedidos descrito en la consigna y el UML. La [resolución](docs/resolucion_tpi.md) organiza las migraciones futuras de backend, frontend, persistencia, autenticación, pedidos, pruebas proporcionales y entrega. No ejecute instrucciones futuras como si existieran: en particular, el seed TPI `python -m app.db.seed`, el usuario `admin`/`Admin1234!`, el login y la arquitectura objetivo son pendientes, no componentes disponibles hoy.
+El archivo `foodstore-frontend/.env.example` ya define `VITE_API_URL=http://localhost:8000/api/v1`.
 
-## Entrega académica
+## Variables de entorno
 
-- Aprobación: **60/100 o más**.
-- Si el proyecto no corre, se aplica el descuento del **30%** indicado por la consigna.
-- Repositorio público del TPI: **Pendiente de publicación**.
-- Video público de defensa: **Pendiente de grabación**.
-- Antes de entregar, completar implementación y verificación contra la consigna; publicar el repositorio con URL real, preparar ZIP sin dependencias, entornos virtuales ni `.env`, y grabar un video público de **10–15 minutos**. El video debe comenzar mostrando al estudiante y recorrer registro, compra como cliente, gestión administrativa y cancelación con restitución de stock.
+### Backend (`foodstore-backend/.env`)
 
-No se atribuye puntaje ni cumplimiento funcional en este estado documental.
+| Variable | Descripción | Valor por defecto en `.env.example` |
+|---|---|---|
+| `DATABASE_URL` | Cadena de conexión SQLAlchemy/SQLModel (PostgreSQL o SQLite) | `postgresql+psycopg2://postgres:postgres@localhost:5432/foodstore` |
+| `SECRET_KEY` | Clave secreta para firmar tokens JWT (`min_length=32`) | `foodstore_dev_secret_key_change_in_production_32chars` |
+| `ALGORITHM` | Algoritmo de firma JWT | `HS256` |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | Duración en minutos de la sesión JWT | `30` |
+| `FRONTEND_ORIGIN` | Origen permitido por CORS con credenciales (`allow_credentials=True`) | `http://localhost:5173` |
+
+### Frontend (`foodstore-frontend/.env`)
+
+| Variable | Descripción | Valor por defecto en `.env.example` |
+|---|---|---|
+| `VITE_API_URL` | URL base de la API REST (incluye prefijo `/api/v1`) | `http://localhost:8000/api/v1` |
+
+## URLs principales del sistema
+
+| Servicio / Vista | URL | Acceso |
+|---|---|---|
+| Frontend — Catálogo público | `http://localhost:5173/` | Público |
+| Frontend — Login y Registro | `http://localhost:5173/login` · `http://localhost:5173/register` | Público |
+| Frontend — Carrito, Checkout y Mis Pedidos | `http://localhost:5173/carrito` · `/checkout` · `/mis-pedidos` | Cliente / Admin autenticado |
+| Frontend — Panel Admin (Resumen, Categorías, Productos, Pedidos, Usuarios) | `http://localhost:5173/admin/resumen` · `/admin/categorias` · `/admin/productos` · `/admin/pedidos` · `/admin/usuarios` | Solo `admin` |
+| Backend — Prefijo base API REST | `http://localhost:8000/api/v1` | REST JSON + Cookie `HttpOnly` |
+| Backend — Documentación Swagger UI | `http://localhost:8000/docs` | Público |
+| Backend — Documentación ReDoc | `http://localhost:8000/redoc` | Público |
+
+## Elementos adicionales respecto al cumplimiento estricto de las consignas
+
+Además de satisfacer íntegramente las diez rúbricas, las reglas de negocio (`RN-01` a `RN-06`) y los requisitos de arquitectura de [consignas_tpi.md](docs/consignas_tpi.md), el proyecto incorpora un conjunto de controles defensivos, validaciones de borde y medidas de robustez documental y técnica. El flujo completo de roles, guardias de ruta y barreras de autorización se detalla en el diagrama [docs/diagrama_rbac.mmd](docs/diagrama_rbac.mmd).
+
+1. **Límite defensivo en notas de checkout (`NOTAS_MAX_LENGTH = 500`):**  
+   Aunque la consigna define `notas` como campo opcional sin cota explícita, `foodstore-frontend/src/features/pedidos/validation/checkoutValidation.ts` establece `NOTAS_MAX_LENGTH = 500` y valida el texto tras `.trim()` en `validateNotas`, evitando envíos desmedidos desde el formulario de checkout.
+2. **Cota de 72 bytes UTF-8 para `bcrypt` en frontend y backend:**  
+   Dado que `bcrypt` trunca silenciosamente contraseñas mayores a 72 bytes, tanto el validador frontend (`TextEncoder` en `foodstore-frontend/src/features/auth/validation/authValidation.ts`) como el backend (`len(password.encode("utf-8")) > 72` en `foodstore-backend/app/core/security.py` y `foodstore-backend/app/modules/usuarios/schemas.py`) rechazan explícitamente contraseñas que superen los 72 bytes en UTF-8 (incluso con caracteres multibyte/emojis).
+3. **Normalización a `null` (`None`) en notas vacías o compuestas solo por espacios:**  
+   Tanto `CheckoutPage.tsx` (`notas: trimmedNotas.length > 0 ? trimmedNotas : null`) como `_normalizar_notas` en `foodstore-backend/app/modules/pedidos/service.py` recortan espacios externos con `.trim()`/`.strip()` y normalizan cadenas vacías o de puro espacio a `null` (`None`), garantizando persistencia limpia en base de datos.
+4. **Sanitización de `imagen_url` (`isValidImageUrl`) y fallback `onError` sin loop de red:**  
+   `ProductoCard.tsx` y `AdminProductosPage.tsx` validan las URLs de imagen mediante `isValidImageUrl` aceptando únicamente `https://`, `http://` o rutas locales `/img/...` (bloqueando esquemas peligrosos como `javascript:`, `data:`, `vbscript:`, rutas `//` o traversal `..`), y registran la URL fallida en `onError` para mostrar un fallback visual sin provocar reintentos ni bucles infinitos de red.
+5. **Deduplicación de verificación de sesión (`activeCheck`) y control de generación (`authGeneration`):**  
+   `foodstore-frontend/src/store/authStore.ts` deduplica llamadas concurrentes a `checkSession()` compartiendo una promesa `activeCheck`, y utiliza un contador monotónico `authGeneration` junto con un `WeakMap` (`requestGenerations` en `src/shared/api/axiosInstance.ts`) para descartar respuestas tardías o expiraciones de sesión pertenecientes a generaciones previas tras un `logout` o cambio de usuario.
+6. **Bloqueo pesimista `with_for_update` (`SELECT ... FOR UPDATE`) en transacciones de stock y pedidos:**  
+   `ProductoRepository` (`get_by_id(..., for_update=True)` y `get_activo_by_id(..., for_update=True)`) y `PedidoRepository` (`get_by_id(..., for_update=True)`) aplican `statement.with_for_update()` durante la creación de pedidos (`RN-01`), cambios de estado (`RN-02`) y cancelaciones con restitución de stock (`RN-03`), previniendo condiciones de carrera y sobreventa bajo concurrencia en PostgreSQL.

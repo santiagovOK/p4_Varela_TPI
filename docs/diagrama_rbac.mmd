@@ -1,0 +1,78 @@
+flowchart TD
+    %% =========================================================================
+    %% Arquitectura RBAC, Guardias Frontend y Cadena de Seguridad Backend
+    %% Food Store — Sistema de pedidos de comida (TPI Programación IV)
+    %% =========================================================================
+
+    subgraph ROLES["Roles del Sistema"]
+        R_ANON["Anónimo (sin sesión)"]
+        R_USER["Cliente (role = 'user')"]
+        R_ADMIN["Administrador (role = 'admin')"]
+    end
+
+    subgraph FE_GUARD["Frontend: Guardias de Enrutamiento y UI"]
+        FE_AUTH["AuthProvider: checkSession() al montar"]
+        FE_PUB["Rutas públicas: /, /login, /register, /carrito, /unauthorized"]
+        FE_PR["ProtectedRoute (Outlet)"]
+        FE_LOAD["1. cargando === true -> Indicador accesible"]
+        FE_NOUSER["2. !usuario -> Redirect /login (state.from)"]
+        FE_ROLE{"3. allowedRoles incluye usuario.role?"}
+        FE_UNAUTH["Redirect /unauthorized"]
+        FE_PRIV["Rutas Cliente: /checkout, /mis-pedidos, /mis-pedidos/:id"]
+        FE_ISOL["Aislamiento FE: pedido.usuario_id === usuario.id"]
+        FE_ADM["Rutas Admin: /admin/resumen, /admin/categorias, /admin/productos, /admin/pedidos, /admin/usuarios"]
+        FE_SELF_UI["UsuariosTable (/admin/usuarios): oculta botón 'Desactivar' si row.id === currentUserId"]
+    end
+
+    subgraph BE_CHAIN["Backend: Cadena de Seguridad FastAPI (/api/v1)"]
+        BE_COOKIE["OAuth2PasswordBearerWithCookie (solo cookie HttpOnly access_token; rechaza Authorization Bearer -> 401)"]
+        BE_CURR["get_current_user: valida JWT (sub, role, type='access', exp) + consulta autoritativa en BD -> 401"]
+        BE_ACT["get_current_active_user: verifica disabled === false -> 400 'Cuenta de usuario desactivada'"]
+        BE_ROLE{"require_role(['admin']): role in allowed_roles?"}
+        BE_403["403 Forbidden"]
+        BE_PUB["Endpoints públicos: /auth/register, /auth/token, /auth/logout, GET /categorias, GET /productos"]
+        BE_PED_AUTH["Endpoints sesión activa: /auth/me, POST /pedidos, GET /pedidos, GET /pedidos/{id}, PATCH /pedidos/{id}/cancelar"]
+        BE_IDOR{"Prevención IDOR (RN-04): pedido.usuario_id === current_user.id o admin?"}
+        BE_IDOR_403["PedidoAjeno -> 403 Forbidden"]
+        BE_ADM_EP["Endpoints Admin: /admin/usuarios, /pedidos/resumen, PATCH /pedidos/{id}/estado, ABM catálogo"]
+        BE_SELF_BE{"Auto-desactivación: id === current_user.id?"}
+        BE_SELF_400["AutoDesactivacionNoPermitida -> 400 Bad Request"]
+    end
+
+    %% Flujo desde Roles hacia Frontend
+    R_ANON --> FE_PUB
+    R_ANON --> FE_PR
+    R_USER --> FE_PR
+    R_ADMIN --> FE_PR
+
+    FE_AUTH --> FE_PR
+    FE_PR --> FE_LOAD
+    FE_LOAD --> FE_NOUSER
+    FE_NOUSER -->|"usuario autenticado"| FE_ROLE
+    FE_ROLE -->|"No (ej. user -> /admin/*)"| FE_UNAUTH
+    FE_ROLE -->|"Sí (sin allowedRoles o role válido)"| FE_PRIV
+    FE_ROLE -->|"Sí (role === 'admin')"| FE_ADM
+
+    FE_PRIV --> FE_ISOL
+    FE_ADM --> FE_SELF_UI
+
+    %% Flujo desde Frontend / Cliente HTTP hacia Backend
+    FE_PUB -->|"GET/POST públicos"| BE_PUB
+    FE_PRIV -->|"Cookie HttpOnly (withCredentials: true)"| BE_COOKIE
+    FE_ADM -->|"Cookie HttpOnly (withCredentials: true)"| BE_COOKIE
+
+    BE_COOKIE -->|"Token válido en cookie"| BE_CURR
+    BE_CURR -->|"Usuario existente"| BE_ACT
+    BE_ACT -->|"Usuario activo -> Endpoints sesión"| BE_PED_AUTH
+    BE_ACT -->|"Requiere rol admin"| BE_ROLE
+
+    BE_ROLE -->|"No"| BE_403
+    BE_ROLE -->|"Sí"| BE_ADM_EP
+
+    BE_PED_AUTH -->|"GET /pedidos/{id} o PATCH /cancelar"| BE_IDOR
+    BE_IDOR -->|"No"| BE_IDOR_403
+    BE_IDOR -->|"Sí"| BE_PED_OK["200 OK (PedidoRead)"]
+
+    BE_ADM_EP -->|"POST /admin/usuarios/{id}/desactivar"| BE_SELF_BE
+    BE_SELF_BE -->|"Sí"| BE_SELF_400
+    BE_SELF_BE -->|"No"| BE_SELF_OK["200 OK (UserPublic desactivado)"]

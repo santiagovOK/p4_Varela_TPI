@@ -68,6 +68,7 @@ sync_kanban.js
 guidelines/
 templates/
 presentation/
+.githooks/
 
 
 # Alembic (si usás migraciones, NO ignores alembic/ ni versions/)
